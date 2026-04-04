@@ -405,7 +405,7 @@ nav .container {
 }
 
 .event-list {
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
@@ -434,15 +434,16 @@ nav .container {
 
 .event-snapshot-wrapper {
   margin-top: 8px;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   border: 1px solid var(--border);
+  max-width: 280px;
 }
 
 .event-snapshot {
   width: 100%;
   display: block;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .event-badge {
