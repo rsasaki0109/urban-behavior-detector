@@ -1,0 +1,45 @@
+{
+  "video_id": "sample_station",
+  "video_file": "sample_station.mp4",
+  "fps": 30.0,
+  "total_frames": 1200,
+  "resolution": "1920x1080",
+  "events": [
+    {
+      "type": "walking_smoking",
+      "track_id": 2,
+      "start_frame": 90,
+      "end_frame": 140,
+      "confidence": 0.75,
+      "start_time": 3.0,
+      "end_time": 4.67
+    },
+    {
+      "type": "bicycle_umbrella",
+      "track_id": 5,
+      "start_frame": 300,
+      "end_frame": 370,
+      "confidence": 0.64,
+      "start_time": 10.0,
+      "end_time": 12.33
+    },
+    {
+      "type": "bicycle_phone",
+      "track_id": 8,
+      "start_frame": 650,
+      "end_frame": 710,
+      "confidence": 0.73,
+      "start_time": 21.67,
+      "end_time": 23.67
+    },
+    {
+      "type": "walking_smoking",
+      "track_id": 15,
+      "start_frame": 980,
+      "end_frame": 1050,
+      "confidence": 0.88,
+      "start_time": 32.67,
+      "end_time": 35.0
+    }
+  ]
+}

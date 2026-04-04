@@ -1,0 +1,76 @@
+# Urban Behavior Detector - Violation Rules Configuration
+
+walking_smoking:
+  enabled: true
+  # Maximum distance ratio (relative to body height) between hand and mouth
+  hand_mouth_distance: 0.12
+  # Minimum speed (pixels/frame) to consider "walking"
+  speed_threshold: 1.5
+  # Minimum consecutive frames to trigger violation
+  min_duration_frames: 8
+  # Confidence threshold for reporting
+  confidence_threshold: 0.5
+  # Wrist-to-nose distance ratio for pose-based detection
+  pose_wrist_nose_ratio: 0.15
+
+bicycle_phone:
+  enabled: true
+  # Distance ratio between phone-like object and face
+  phone_near_face_threshold: 0.15
+  # Minimum consecutive frames
+  min_duration_frames: 6
+  confidence_threshold: 0.5
+
+bicycle_umbrella:
+  enabled: true
+  # Umbrella detected above cyclist
+  umbrella_overlap_threshold: 0.3
+  min_duration_frames: 5
+  confidence_threshold: 0.5
+
+bicycle_wrong_way:
+  enabled: false
+  # Requires lane direction configuration per scene
+  expected_direction: "right"
+  angle_tolerance: 45
+  min_duration_frames: 10
+  confidence_threshold: 0.6
+
+signal_violation:
+  enabled: false
+  # Pixel distance threshold between bicycle and traffic signal
+  proximity_threshold: 200
+  min_duration_frames: 5
+  confidence_threshold: 0.5
+  min_crossing_speed: 2.0
+
+sidewalk_riding:
+  enabled: false
+  # Sidewalk zone defined as polygon points (per-scene config)
+  # sidewalk_zones: [[x1,y1], [x2,y2], [x3,y3], [x4,y4]]
+  min_duration_frames: 8
+  confidence_threshold: 0.5
+
+# Detection settings
+detection:
+  model: "yolov8n.pt"
+  confidence: 0.4
+  iou_threshold: 0.5
+  classes: [0, 1, 9, 25, 26, 27, 39, 67]
+  # COCO classes: 0=person, 1=bicycle, 9=traffic light, 25=umbrella, 26=handbag, 27=tie, 39=bottle, 67=cell phone
+  # Pose estimation (optional, improves walking smoking detection)
+  use_pose: false
+  pose_model: "yolov8n-pose.pt"
+
+# Tracker settings
+tracking:
+  max_age: 30
+  min_hits: 3
+  iou_threshold: 0.3
+
+# Location settings (optional, for heatmap generation)
+# Set the camera's GPS coordinates to geo-reference violation events
+location:
+  lat: null
+  lon: null
+  name: ""
