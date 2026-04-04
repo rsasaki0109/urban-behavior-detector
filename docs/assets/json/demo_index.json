@@ -1,5 +1,64 @@
 [
   {
+    "video_id": "kabukicho_3m",
+    "video_file": "kabukicho_3m.mp4",
+    "fps": 30.0,
+    "total_frames": 5400,
+    "resolution": "854x480",
+    "events": [
+      {
+        "type": "walking_smoking",
+        "track_id": 214,
+        "start_frame": 1464,
+        "end_frame": 1466,
+        "confidence": 0.69,
+        "start_time": 48.8,
+        "end_time": 48.87
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 361,
+        "start_frame": 2136,
+        "end_frame": 2138,
+        "confidence": 0.69,
+        "start_time": 71.2,
+        "end_time": 71.27
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 399,
+        "start_frame": 2536,
+        "end_frame": 2539,
+        "confidence": 0.67,
+        "start_time": 84.53,
+        "end_time": 84.63
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 473,
+        "start_frame": 3024,
+        "end_frame": 3026,
+        "confidence": 0.69,
+        "start_time": 100.8,
+        "end_time": 100.87
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 662,
+        "start_frame": 5225,
+        "end_frame": 5227,
+        "confidence": 0.69,
+        "start_time": 174.17,
+        "end_time": 174.23
+      }
+    ],
+    "location": {
+      "lat": 35.6938,
+      "lon": 139.7034,
+      "name": "Kabukicho, Shinjuku"
+    }
+  },
+  {
     "video_id": "sample_crosswalk",
     "video_file": "sample_crosswalk.mp4",
     "fps": 30.0,
@@ -79,29 +138,5 @@
         "end_time": 35.0
       }
     ]
-  },
-  {
-    "video_id": "cyclist_city",
-    "video_file": "cyclist_city.mp4",
-    "fps": 23.976023976023978,
-    "total_frames": 284,
-    "resolution": "1280x720",
-    "events": []
-  },
-  {
-    "video_id": "pedestrian_tokyo",
-    "video_file": "pedestrian_tokyo.mp4",
-    "fps": 25.0,
-    "total_frames": 474,
-    "resolution": "1280x720",
-    "events": []
-  },
-  {
-    "video_id": "pedestrians_tram",
-    "video_file": "pedestrians_tram.mp4",
-    "fps": 23.976023976023978,
-    "total_frames": 449,
-    "resolution": "1280x720",
-    "events": []
   }
 ]

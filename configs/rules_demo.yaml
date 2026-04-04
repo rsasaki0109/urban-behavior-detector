@@ -1,0 +1,59 @@
+# Demo-tuned config: lower thresholds to showcase detection on real footage
+# Not for production use - intentionally more sensitive
+
+walking_smoking:
+  enabled: true
+  hand_mouth_distance: 0.25
+  speed_threshold: 0.5
+  min_duration_frames: 3
+  confidence_threshold: 0.3
+  pose_wrist_nose_ratio: 0.25
+
+bicycle_phone:
+  enabled: true
+  phone_near_face_threshold: 0.3
+  min_duration_frames: 3
+  confidence_threshold: 0.3
+
+bicycle_umbrella:
+  enabled: true
+  umbrella_overlap_threshold: 0.15
+  min_duration_frames: 3
+  confidence_threshold: 0.3
+
+bicycle_wrong_way:
+  enabled: false
+  expected_direction: "right"
+  angle_tolerance: 45
+  min_duration_frames: 5
+  confidence_threshold: 0.3
+
+signal_violation:
+  enabled: false
+  proximity_threshold: 300
+  min_duration_frames: 3
+  confidence_threshold: 0.3
+  min_crossing_speed: 1.0
+
+sidewalk_riding:
+  enabled: false
+  min_duration_frames: 5
+  confidence_threshold: 0.3
+
+detection:
+  model: "yolov8n.pt"
+  confidence: 0.3
+  iou_threshold: 0.5
+  classes: [0, 1, 9, 25, 26, 27, 39, 67]
+  use_pose: false
+  pose_model: "yolov8n-pose.pt"
+
+tracking:
+  max_age: 30
+  min_hits: 2
+  iou_threshold: 0.25
+
+location:
+  lat: 35.6938
+  lon: 139.7034
+  name: "Kabukicho, Shinjuku"
