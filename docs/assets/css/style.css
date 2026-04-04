@@ -410,14 +410,18 @@ nav .container {
 }
 
 .event-item {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(42, 58, 80, 0.5);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.event-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 12px;
   align-items: center;
-  padding: 10px 16px;
-  border-bottom: 1px solid rgba(42, 58, 80, 0.5);
-  font-size: 0.8rem;
-  transition: background 0.15s;
 }
 
 .event-item:hover {
@@ -426,6 +430,19 @@ nav .container {
 
 .event-item:last-child {
   border-bottom: none;
+}
+
+.event-snapshot-wrapper {
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.event-snapshot {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
 }
 
 .event-badge {

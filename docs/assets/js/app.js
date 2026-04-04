@@ -150,13 +150,16 @@
     }
 
     list.innerHTML = events.map(e => `
-      <div class="event-item" data-start-time="${e.start_time}" title="Click to seek to ${formatTime(e.start_time)}">
-        <span class="event-badge ${e.type}">${VIOLATION_LABELS[e.type] || e.type}</span>
-        <span class="event-info">
-          <strong>Track #${e.track_id}</strong> &middot;
-          ${formatTime(e.start_time)} &ndash; ${formatTime(e.end_time)}
-        </span>
-        <span class="event-conf">${(e.confidence * 100).toFixed(0)}%</span>
+      <div class="event-item" data-start-time="${e.start_time}" data-snapshot="${e.snapshot || ''}" title="Click to seek to ${formatTime(e.start_time)}">
+        <div class="event-row">
+          <span class="event-badge ${e.type}">${VIOLATION_LABELS[e.type] || e.type}</span>
+          <span class="event-info">
+            <strong>Track #${e.track_id}</strong> &middot;
+            ${formatTime(e.start_time)} &ndash; ${formatTime(e.end_time)}
+          </span>
+          <span class="event-conf">${(e.confidence * 100).toFixed(0)}%</span>
+        </div>
+        ${e.snapshot ? `<div class="event-snapshot-wrapper"><img class="event-snapshot" src="${e.snapshot}" alt="Detection frame" loading="lazy"></div>` : ''}
       </div>
     `).join('');
 
