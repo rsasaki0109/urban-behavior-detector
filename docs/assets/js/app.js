@@ -145,7 +145,7 @@
     count.textContent = events.length + ' events';
 
     if (events.length === 0) {
-      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No violations detected</div>';
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No violations detected in this footage.<br>Detection &amp; tracking are active &mdash; see the annotated video above.</div>';
       return;
     }
 
@@ -246,6 +246,11 @@
 
     const types = ['walking_smoking', 'bicycle_phone', 'bicycle_umbrella',
                    'bicycle_wrong_way', 'signal_violation', 'sidewalk_riding'];
+    if (data.events.length === 0) {
+      body.innerHTML = '<div class="stat-card"><div class="stat-value" style="color:var(--green);">0</div><div class="stat-label">No violations detected</div></div>';
+      return;
+    }
+
     body.innerHTML = [
       { label: 'Total Events', value: data.events.length, cls: '' },
       ...types
@@ -273,29 +278,12 @@
   function getEmbeddedData() {
     return [
       {
-        video_id: "sample_crosswalk",
-        video_file: "sample_crosswalk.mp4",
+        video_id: "kabukicho_3m",
+        video_file: "kabukicho_3m.mp4",
         fps: 30.0,
-        total_frames: 900,
-        resolution: "1920x1080",
-        events: [
-          { type: "walking_smoking", track_id: 3, start_frame: 120, end_frame: 165, confidence: 0.71, start_time: 4.0, end_time: 5.5 },
-          { type: "walking_smoking", track_id: 7, start_frame: 410, end_frame: 480, confidence: 0.82, start_time: 13.67, end_time: 16.0 },
-          { type: "bicycle_phone", track_id: 12, start_frame: 540, end_frame: 590, confidence: 0.68, start_time: 18.0, end_time: 19.67 },
-        ]
-      },
-      {
-        video_id: "sample_station",
-        video_file: "sample_station.mp4",
-        fps: 30.0,
-        total_frames: 1200,
-        resolution: "1920x1080",
-        events: [
-          { type: "walking_smoking", track_id: 2, start_frame: 90, end_frame: 140, confidence: 0.75, start_time: 3.0, end_time: 4.67 },
-          { type: "bicycle_umbrella", track_id: 5, start_frame: 300, end_frame: 370, confidence: 0.64, start_time: 10.0, end_time: 12.33 },
-          { type: "bicycle_phone", track_id: 8, start_frame: 650, end_frame: 710, confidence: 0.73, start_time: 21.67, end_time: 23.67 },
-          { type: "walking_smoking", track_id: 15, start_frame: 980, end_frame: 1050, confidence: 0.88, start_time: 32.67, end_time: 35.0 },
-        ]
+        total_frames: 5400,
+        resolution: "854x480",
+        events: []
       }
     ];
   }
