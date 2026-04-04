@@ -1,13 +1,11 @@
-# Pose-based detection config
-# Uses YOLOv8-pose keypoints for accurate wrist-to-nose smoking detection
+# Cigarette model config (no pose, faster on CPU)
 
 walking_smoking:
   enabled: true
   hand_mouth_distance: 0.12
   speed_threshold: 0.8
-  min_duration_frames: 5
+  min_duration_frames: 4
   confidence_threshold: 0.4
-  pose_wrist_nose_ratio: 0.12
 
 bicycle_phone:
   enabled: true
@@ -23,14 +21,8 @@ bicycle_umbrella:
 
 bicycle_wrong_way:
   enabled: false
-  expected_direction: "right"
-  angle_tolerance: 45
-  min_duration_frames: 8
-  confidence_threshold: 0.5
-
 signal_violation:
   enabled: false
-
 sidewalk_riding:
   enabled: false
 
@@ -39,8 +31,7 @@ detection:
   confidence: 0.35
   iou_threshold: 0.5
   classes: [0, 1, 9, 25, 26, 27, 39, 67]
-  use_pose: true
-  pose_model: "yolov8n-pose.pt"
+  use_pose: false
   cigarette_model: "models/cigarette_yolov11m.pt"
   cigarette_confidence: 0.25
 
