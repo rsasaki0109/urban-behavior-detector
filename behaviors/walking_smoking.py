@@ -1,10 +1,10 @@
 """Walking while smoking detection.
 
-Supports two detection modes:
-1. Pose-based (preferred): Uses YOLOv8-pose keypoints to check wrist-to-nose distance
-2. Proxy-based (fallback): Uses small object (bottle/handbag) near mouth area
-
-The mode is selected automatically based on whether pose detections are provided.
+Detection strategy:
+- Uses YOLOv8-pose to track wrist-to-nose distance over time
+- Smoking gesture: hand repeatedly moves to mouth and back (oscillation)
+- Phone usage: hand stays near face continuously (no oscillation)
+- Requires the person to be walking (speed > threshold)
 """
 
 from collections import defaultdict
@@ -17,53 +17,29 @@ from trackers.sort_tracker import Track
 
 
 class WalkingSmokingAnalyzer(BehaviorAnalyzer):
-    """Detect walking while smoking behavior."""
+    """Detect walking while smoking behavior via pose oscillation."""
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.hand_mouth_distance = config.get("hand_mouth_distance", 0.12)
         self.speed_threshold = config.get("speed_threshold", 1.5)
         self.min_duration = config.get("min_duration_frames", 8)
         self.confidence_threshold = config.get("confidence_threshold", 0.5)
         self.pose_wrist_nose_ratio = config.get("pose_wrist_nose_ratio", 0.15)
+        self.min_oscillations = config.get("min_oscillations", 2)
 
-        # track_id -> list of frame indices where smoking pose detected
+        # track_id -> list of (frame_idx, wrist_nose_distance_ratio)
+        self._distance_history: dict[int, list[tuple[int, float]]] = defaultdict(list)
+        # track_id -> list of frame indices where smoking detected
         self._candidates: dict[int, list[int]] = defaultdict(list)
         self._reported: set[int] = set()
         self._events: list[ViolationEvent] = []
 
-    def _is_near_mouth(self, person_bbox: np.ndarray, obj_bbox: np.ndarray) -> bool:
-        """Check if a small object is near the mouth/hand area of a person."""
-        person_h = person_bbox[3] - person_bbox[1]
-        person_w = person_bbox[2] - person_bbox[0]
+    def _get_wrist_nose_distance(self, track: Track,
+                                 pose_detections: list) -> float | None:
+        """Get minimum wrist-to-nose distance ratio for a tracked person."""
+        if not pose_detections:
+            return None
 
-        # Mouth region: upper 20-35% of body, horizontally centered
-        mouth_y = person_bbox[1] + person_h * 0.15
-        mouth_y_end = person_bbox[1] + person_h * 0.30
-        mouth_x = person_bbox[0] + person_w * 0.2
-        mouth_x_end = person_bbox[2] - person_w * 0.2
-
-        obj_center = np.array([(obj_bbox[0] + obj_bbox[2]) / 2, (obj_bbox[1] + obj_bbox[3]) / 2])
-
-        # Check if object center is near mouth region
-        dist_x = max(0, max(mouth_x - obj_center[0], obj_center[0] - mouth_x_end))
-        dist_y = max(0, max(mouth_y - obj_center[1], obj_center[1] - mouth_y_end))
-        dist = np.sqrt(dist_x**2 + dist_y**2)
-
-        return dist < person_h * self.hand_mouth_distance
-
-    def _check_smoking_proxy(self, track: Track,
-                             all_detections: list[Detection]) -> bool:
-        """Fallback: check if small proxy objects are near mouth area."""
-        small_objects = [d for d in all_detections
-                         if d.class_name in ("bottle", "handbag", "cell phone")
-                         and d.width < 80 and d.height < 80]
-        return any(self._is_near_mouth(track.bbox, obj.bbox) for obj in small_objects)
-
-    def _check_smoking_pose(self, track: Track,
-                            pose_detections: list) -> bool:
-        """Preferred: check wrist-to-nose distance via pose keypoints."""
-        # Find the pose detection that best matches this track
         best_iou = 0.0
         best_pose = None
         for pose in pose_detections:
@@ -73,13 +49,63 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
                 best_pose = pose
 
         if best_pose is None or best_iou < 0.5:
+            return None
+
+        nose = best_pose.keypoint(0)  # NOSE
+        if nose is None:
+            return None
+
+        height = best_pose.height
+        if height <= 0:
+            return None
+
+        min_dist = float("inf")
+        for wrist_idx in (9, 10):  # LEFT_WRIST, RIGHT_WRIST
+            wrist = best_pose.keypoint(wrist_idx)
+            if wrist is not None:
+                dist = float(np.linalg.norm(wrist - nose))
+                min_dist = min(min_dist, dist)
+
+        if min_dist == float("inf"):
+            return None
+
+        return min_dist / height
+
+    def _detect_oscillation(self, track_id: int) -> bool:
+        """Detect hand-to-mouth oscillation pattern in distance history.
+
+        Smoking pattern: distance alternates between near (<threshold)
+        and far (>threshold * 2), at least min_oscillations times.
+        Phone pattern: distance stays consistently near.
+        """
+        history = self._distance_history.get(track_id, [])
+        if len(history) < 6:
             return False
 
-        return best_pose.wrist_near_nose(self.pose_wrist_nose_ratio)
+        threshold = self.pose_wrist_nose_ratio
+        recent = [d for _, d in history[-30:]]  # last 30 data points
+
+        # Count transitions: near->far and far->near
+        near = [d < threshold for d in recent]
+        transitions = 0
+        for i in range(1, len(near)):
+            if near[i] != near[i - 1]:
+                transitions += 1
+
+        # Need at least min_oscillations full cycles (near->far->near = 2 transitions)
+        has_oscillation = transitions >= self.min_oscillations * 2
+
+        # Also require some "near" frames (hand actually reaches mouth)
+        near_count = sum(near)
+        near_ratio = near_count / len(recent)
+
+        # Smoking: 20-70% near (oscillating). Phone: >80% near (constant).
+        is_smoking_pattern = 0.15 <= near_ratio <= 0.75
+
+        return has_oscillation and is_smoking_pattern
 
     @staticmethod
     def _bbox_iou(box_a: np.ndarray, box_b: np.ndarray) -> float:
-        """Compute IoU between two boxes."""
         x1 = max(box_a[0], box_b[0])
         y1 = max(box_a[1], box_b[1])
         x2 = min(box_a[2], box_b[2])
@@ -97,18 +123,15 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
             return False
 
         person_h = track.bbox[3] - track.bbox[1]
-        # Upper body region (top 50%)
         upper_body = np.array([
             track.bbox[0], track.bbox[1],
             track.bbox[2], track.bbox[1] + person_h * 0.5,
         ])
 
         for cig in cigarette_detections:
-            # Check if cigarette bbox overlaps with upper body
             iou = self._bbox_iou(upper_body, cig.bbox)
             if iou > 0.0:
                 return True
-            # Also check proximity (cigarette center within person bbox)
             cx, cy = cig.center
             if (track.bbox[0] <= cx <= track.bbox[2]
                     and track.bbox[1] <= cy <= track.bbox[1] + person_h * 0.6):
@@ -129,33 +152,40 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
             if track.speed < self.speed_threshold:
                 continue
 
-            # Priority: cigarette model > pose > proxy
-            if cigarette_detections:
-                smoking_pose = self._check_cigarette_near_person(
-                    track, cigarette_detections)
-            elif pose_detections:
-                smoking_pose = self._check_smoking_pose(track, pose_detections)
-            else:
-                smoking_pose = self._check_smoking_proxy(track, all_detections)
+            smoking_detected = False
 
-            if smoking_pose:
+            # Method 1: Pose oscillation (most reliable for smoking vs phone)
+            if pose_detections:
+                dist = self._get_wrist_nose_distance(track, pose_detections)
+                if dist is not None:
+                    self._distance_history[track.track_id].append((frame_idx, dist))
+                    # Prune old history
+                    cutoff = frame_idx - 90  # ~3 seconds at 30fps
+                    self._distance_history[track.track_id] = [
+                        (f, d) for f, d in self._distance_history[track.track_id]
+                        if f >= cutoff
+                    ]
+
+                    if self._detect_oscillation(track.track_id):
+                        smoking_detected = True
+
+            # Method 2: Cigarette object detection (supplementary)
+            if cigarette_detections and not smoking_detected:
+                if self._check_cigarette_near_person(track, cigarette_detections):
+                    # Cigarette detected near person + walking = likely smoking
+                    smoking_detected = True
+
+            if smoking_detected:
                 self._candidates[track.track_id].append(frame_idx)
             else:
-                # Allow small gaps (2 frames)
                 frames = self._candidates.get(track.track_id, [])
-                if frames and frame_idx - frames[-1] > 2:
+                if frames and frame_idx - frames[-1] > 5:
                     self._candidates[track.track_id] = []
 
-            # Check if violation threshold met
             frames = self._candidates.get(track.track_id, [])
             if (len(frames) >= self.min_duration
                     and track.track_id not in self._reported):
                 conf = compute_confidence(frames)
-                # Boost confidence for more reliable detection methods
-                if cigarette_detections:
-                    conf = min(0.98, conf + 0.10)
-                elif pose_detections:
-                    conf = min(0.98, conf + 0.05)
                 if conf >= self.confidence_threshold:
                     event = ViolationEvent(
                         violation_type="walking_smoking",

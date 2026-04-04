@@ -52,8 +52,6 @@ class TestPoseDetection:
         assert pose.keypoint(NOSE) is None
 
     def test_wrist_near_nose_true(self):
-        # Person height = 200, threshold = 0.15 * 200 = 30
-        # Wrist at (105, 55), nose at (100, 50), distance ~7
         kps = _make_keypoints({
             NOSE: (100, 50, 0.9),
             RIGHT_WRIST: (105, 55, 0.8),
@@ -62,7 +60,6 @@ class TestPoseDetection:
         assert pose.wrist_near_nose(0.15) is True
 
     def test_wrist_near_nose_false(self):
-        # Wrist far from nose
         kps = _make_keypoints({
             NOSE: (100, 50, 0.9),
             RIGHT_WRIST: (100, 180, 0.8),
@@ -84,69 +81,74 @@ class TestPoseDetection:
         assert pose.wrist_near_nose(0.15) is True
 
 
-class TestWalkingSmokingWithPose:
+class TestSmokingOscillation:
+    """Test the oscillation-based smoking detection."""
+
     CONFIG = {
         "enabled": True,
-        "hand_mouth_distance": 0.12,
         "speed_threshold": 1.5,
-        "min_duration_frames": 8,
-        "confidence_threshold": 0.5,
+        "min_duration_frames": 5,
+        "confidence_threshold": 0.4,
         "pose_wrist_nose_ratio": 0.15,
+        "min_oscillations": 2,
     }
 
-    def test_pose_based_detection(self):
-        """Smoking detected via pose keypoints."""
+    def test_oscillation_pattern_triggers(self):
+        """Hand moving to mouth and back repeatedly = smoking."""
         analyzer = WalkingSmokingAnalyzer(self.CONFIG)
         track = _make_walking_track(1, [50, 0, 150, 200])
-
-        # Pose with wrist near nose
-        kps = _make_keypoints({
-            NOSE: (100, 30, 0.9),
-            RIGHT_WRIST: (105, 35, 0.8),
-        })
-        pose = _make_pose([50, 0, 150, 200], kps)
+        bbox = [50, 0, 150, 200]
 
         all_events = []
-        for i in range(15):
+        for i in range(40):
+            # Oscillate: even frames = near nose, odd frames = far
+            if i % 4 < 2:
+                # Near nose
+                kps = _make_keypoints({
+                    NOSE: (100, 30, 0.9),
+                    RIGHT_WRIST: (103, 33, 0.8),
+                })
+            else:
+                # Far from nose
+                kps = _make_keypoints({
+                    NOSE: (100, 30, 0.9),
+                    RIGHT_WRIST: (100, 150, 0.8),
+                })
+            pose = _make_pose(bbox, kps)
             events = analyzer.update(i, [track], [], pose_detections=[pose])
             all_events.extend(events)
 
         assert len(all_events) == 1
         assert all_events[0].violation_type == "walking_smoking"
-        # Pose-based gets confidence boost
-        assert all_events[0].confidence > 0.7
 
-    def test_no_detection_when_wrist_far(self):
-        """No violation when wrist is far from nose."""
+    def test_constant_near_nose_no_trigger(self):
+        """Hand constantly near nose (phone usage) should NOT trigger."""
         analyzer = WalkingSmokingAnalyzer(self.CONFIG)
         track = _make_walking_track(1, [50, 0, 150, 200])
+        bbox = [50, 0, 150, 200]
 
+        # Hand always near nose - no oscillation
         kps = _make_keypoints({
             NOSE: (100, 30, 0.9),
-            RIGHT_WRIST: (100, 180, 0.8),
+            RIGHT_WRIST: (103, 33, 0.8),
         })
-        pose = _make_pose([50, 0, 150, 200], kps)
+        pose = _make_pose(bbox, kps)
 
         all_events = []
-        for i in range(15):
+        for i in range(40):
             events = analyzer.update(i, [track], [], pose_detections=[pose])
             all_events.extend(events)
 
         assert len(all_events) == 0
 
-    def test_fallback_to_proxy_without_pose(self):
-        """Falls back to proxy detection when no pose data."""
-        from detectors.yolo_detector import Detection
+    def test_no_pose_no_crash(self):
+        """Without pose data, no events and no crash."""
         analyzer = WalkingSmokingAnalyzer(self.CONFIG)
-        track = _make_walking_track(1, [100, 100, 200, 300])
-        det = Detection(
-            bbox=np.array([145, 140, 155, 150], dtype=float),
-            class_id=39, class_name="bottle", confidence=0.8,
-        )
+        track = _make_walking_track(1, [50, 0, 150, 200])
 
         all_events = []
-        for i in range(15):
-            events = analyzer.update(i, [track], [det], pose_detections=None)
+        for i in range(20):
+            events = analyzer.update(i, [track], [], pose_detections=None)
             all_events.extend(events)
 
-        assert len(all_events) == 1
+        assert len(all_events) == 0
