@@ -96,6 +96,7 @@ class VideoPipeline:
             writer = cv2.VideoWriter(output_video, fourcc, fps, (width, height))
 
         all_events: list[ViolationEvent] = []
+        event_snapshots: list[str] = []
         frame_idx = 0
 
         print(f"Processing {video_path} ({total_frames} frames, {fps:.1f} fps)")
@@ -143,9 +144,19 @@ class VideoPipeline:
                 all_events.extend(events)
 
             # Draw annotations
+            annotated = self._draw_frame(frame, detections, tracks, frame_events, frame_idx)
             if writer:
-                annotated = self._draw_frame(frame, detections, tracks, frame_events, frame_idx)
                 writer.write(annotated)
+
+            # Save snapshot for new violation events
+            if frame_events and output_json:
+                snap_dir = Path(output_json).parent / "snapshots"
+                snap_dir.mkdir(parents=True, exist_ok=True)
+                for event in frame_events:
+                    snap_name = f"{Path(video_path).stem}_event_{len(event_snapshots)}.jpg"
+                    cv2.imwrite(str(snap_dir / snap_name), annotated,
+                                [cv2.IMWRITE_JPEG_QUALITY, 85])
+                    event_snapshots.append(snap_name)
 
             frame_idx += 1
             if frame_idx % 100 == 0:
@@ -161,9 +172,11 @@ class VideoPipeline:
             final_events.extend(analyzer.finalize())
 
         event_dicts = [e.to_dict() for e in final_events]
-        for e in event_dicts:
+        for i, e in enumerate(event_dicts):
             e["start_time"] = round(e["start_frame"] / fps, 2)
             e["end_time"] = round(e["end_frame"] / fps, 2)
+            if i < len(event_snapshots):
+                e["snapshot"] = f"snapshots/{event_snapshots[i]}"
 
         # Save JSON
         if output_json:
