@@ -485,6 +485,11 @@ nav .container {
   color: var(--yellow);
 }
 
+.event-badge.walking_phone {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
 .event-badge.bicycle_wrong_way {
   background: rgba(232, 121, 249, 0.15);
   color: #e879f9;
@@ -700,6 +705,7 @@ footer a {
 .timeline-event.walking_smoking { background: var(--red); }
 .timeline-event.bicycle_phone { background: var(--orange); }
 .timeline-event.bicycle_umbrella { background: var(--yellow); }
+.timeline-event.walking_phone { background: #60a5fa; }
 .timeline-event.bicycle_wrong_way { background: #e879f9; }
 .timeline-event.signal_violation { background: #f87171; }
 .timeline-event.sidewalk_riding { background: #22d3ee; }
@@ -737,6 +743,7 @@ footer a {
 .legend-dot.walking_smoking { background: var(--red); }
 .legend-dot.bicycle_phone { background: var(--orange); }
 .legend-dot.bicycle_umbrella { background: var(--yellow); }
+.legend-dot.walking_phone { background: #60a5fa; }
 .legend-dot.bicycle_wrong_way { background: #e879f9; }
 .legend-dot.signal_violation { background: #f87171; }
 .legend-dot.sidewalk_riding { background: #22d3ee; }
@@ -809,6 +816,7 @@ footer a {
 .stat-value.walking_smoking { color: var(--red); }
 .stat-value.bicycle_phone { color: var(--orange); }
 .stat-value.bicycle_umbrella { color: var(--yellow); }
+.stat-value.walking_phone { color: #60a5fa; }
 .stat-value.bicycle_wrong_way { color: #e879f9; }
 .stat-value.signal_violation { color: #f87171; }
 .stat-value.sidewalk_riding { color: #22d3ee; }

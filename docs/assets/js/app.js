@@ -9,6 +9,7 @@
     bicycle_phone: 'Bicycle Phone',
     bicycle_umbrella: 'Bicycle Umbrella',
     bicycle_wrong_way: 'Wrong Way',
+    walking_phone: 'Walking Phone',
     signal_violation: 'Red Light',
     sidewalk_riding: 'Sidewalk Riding',
   };
@@ -249,7 +250,7 @@
       counts[e.type] = (counts[e.type] || 0) + 1;
     }
 
-    const types = ['walking_smoking', 'bicycle_phone', 'bicycle_umbrella',
+    const types = ['walking_smoking', 'walking_phone', 'bicycle_phone', 'bicycle_umbrella',
                    'bicycle_wrong_way', 'signal_violation', 'sidewalk_riding'];
     if (data.events.length === 0) {
       body.innerHTML = '<div class="stat-card"><div class="stat-value" style="color:var(--green);">0</div><div class="stat-label">No violations detected</div></div>';

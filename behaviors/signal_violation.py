@@ -1,8 +1,8 @@
-"""Red light running detection for bicycles.
+"""Red light running detection for bicycles and pedestrians.
 
 Logic:
 - A traffic signal is detected as RED
-- A bicycle passes through the signal's proximity zone while red
+- A bicycle or pedestrian passes through the signal's proximity zone while red
 - The crossing behavior persists for min_duration_frames
 """
 
@@ -16,7 +16,7 @@ from trackers.sort_tracker import Track
 
 
 class SignalViolationAnalyzer(BehaviorAnalyzer):
-    """Detect bicycles running red lights."""
+    """Detect bicycles and pedestrians running red lights."""
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -24,6 +24,10 @@ class SignalViolationAnalyzer(BehaviorAnalyzer):
         self.min_duration = config.get("min_duration_frames", 5)
         self.confidence_threshold = config.get("confidence_threshold", 0.5)
         self.min_crossing_speed = config.get("min_crossing_speed", 2.0)
+        self.detect_pedestrians = config.get("detect_pedestrians", True)
+        self.target_classes = ["bicycle"]
+        if self.detect_pedestrians:
+            self.target_classes.append("person")
 
         # track_id -> list of frame indices where red-light crossing detected
         self._candidates: dict[int, list[int]] = defaultdict(list)
@@ -47,9 +51,9 @@ class SignalViolationAnalyzer(BehaviorAnalyzer):
             return []
 
         new_events = []
-        bicycle_tracks = [t for t in tracks if t.class_name == "bicycle"]
+        target_tracks = [t for t in tracks if t.class_name in self.target_classes]
 
-        for track in bicycle_tracks:
+        for track in target_tracks:
             if track.speed < self.min_crossing_speed:
                 continue
 
