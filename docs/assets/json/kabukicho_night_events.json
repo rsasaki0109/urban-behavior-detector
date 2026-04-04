@@ -13,7 +13,12 @@
       "confidence": 0.71,
       "start_time": 22.47,
       "end_time": 22.7,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_0.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_0.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "medium",
+        "description": "While the image contains a violation alert text, no clear visual evidence (cigarette, smoke, or characteristic hand gesture) confirming a person is smoking while walking can be seen among the detected individuals."
+      }
     },
     {
       "type": "walking_smoking",
@@ -23,7 +28,12 @@
       "confidence": 0.75,
       "start_time": 71.13,
       "end_time": 71.27,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_1.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_1.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "medium",
+        "description": "No person is clearly visible smoking or holding a cigarette in a smoking posture near their mouth in this frame. The crowd is dense, but no visible smoke or smoking items are detectable."
+      }
     },
     {
       "type": "walking_smoking",
@@ -33,7 +43,12 @@
       "confidence": 0.75,
       "start_time": 81.6,
       "end_time": 81.73,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_2.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_2.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "high",
+        "description": "No person is visibly holding a cigarette or actively smoking while walking. No smoke is detectable."
+      }
     },
     {
       "type": "walking_smoking",
@@ -43,7 +58,12 @@
       "confidence": 0.7,
       "start_time": 143.03,
       "end_time": 143.33,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_3.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_3.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "high",
+        "description": "No person in the image is clearly observed smoking or holding an active cigarette while walking."
+      }
     },
     {
       "type": "walking_smoking",
@@ -53,7 +73,12 @@
       "confidence": 0.75,
       "start_time": 173.73,
       "end_time": 173.87,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_4.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_4.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "high",
+        "description": "After carefully reviewing the image, no person is visibly holding a cigarette, smoking, or generating visible smoke while walking."
+      }
     },
     {
       "type": "walking_smoking",
@@ -63,7 +88,12 @@
       "confidence": 0.72,
       "start_time": 217.3,
       "end_time": 217.5,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_5.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_5.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "medium",
+        "description": "The scene is crowded, but no person is clearly visible holding a cigarette near their mouth or exhibiting obvious signs of smoking."
+      }
     },
     {
       "type": "walking_smoking",
@@ -73,7 +103,12 @@
       "confidence": 0.71,
       "start_time": 219.2,
       "end_time": 219.47,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_6.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_6.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "medium",
+        "description": "No person is clearly visible smoking while walking. The crowd is dense, and details of hands or potential smoke are not discernible from this angle."
+      }
     },
     {
       "type": "walking_smoking",
@@ -83,7 +118,12 @@
       "confidence": 0.73,
       "start_time": 277.47,
       "end_time": 277.63,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_7.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_7.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "high",
+        "description": "After careful examination of the crowd, no individual was observed holding a lit cigarette or performing the act of smoking while walking."
+      }
     },
     {
       "type": "walking_smoking",
@@ -93,7 +133,12 @@
       "confidence": 0.7,
       "start_time": 278.1,
       "end_time": 278.4,
-      "snapshot": "assets/img/events/kabukicho_5m_night_event_8.jpg"
+      "snapshot": "assets/img/events/kabukicho_5m_night_event_8.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": false,
+        "confidence": "high",
+        "description": "No person is clearly visible smoking while walking. All individuals checked appear to have natural hand positions, and no visible smoke or cigarettes are detected."
+      }
     }
   ],
   "location": {
