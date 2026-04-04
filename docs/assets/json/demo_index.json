@@ -1,11 +1,82 @@
 [
   {
-    "video_id": "kabukicho_3m",
-    "video_file": "kabukicho_3m.mp4",
+    "video_id": "kabukicho_5m_night",
+    "video_file": "kabukicho_5m_night.mp4",
     "fps": 30.0,
-    "total_frames": 5400,
+    "total_frames": 9000,
     "resolution": "854x480",
-    "events": [],
+    "events": [
+      {
+        "type": "walking_smoking",
+        "track_id": 603,
+        "start_frame": 3126,
+        "end_frame": 3130,
+        "confidence": 0.7,
+        "start_time": 104.2,
+        "end_time": 104.33,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_0.jpg"
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 1014,
+        "start_frame": 5204,
+        "end_frame": 5207,
+        "confidence": 0.72,
+        "start_time": 173.47,
+        "end_time": 173.57,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_1.jpg"
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 1049,
+        "start_frame": 5224,
+        "end_frame": 5227,
+        "confidence": 0.82,
+        "start_time": 174.13,
+        "end_time": 174.23,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_2.jpg"
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 1224,
+        "start_frame": 6384,
+        "end_frame": 6387,
+        "confidence": 0.72,
+        "start_time": 212.8,
+        "end_time": 212.9,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_3.jpg"
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 1255,
+        "start_frame": 6633,
+        "end_frame": 6638,
+        "confidence": 0.79,
+        "start_time": 221.1,
+        "end_time": 221.27,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_4.jpg"
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 1300,
+        "start_frame": 6840,
+        "end_frame": 6843,
+        "confidence": 0.82,
+        "start_time": 228.0,
+        "end_time": 228.1,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_5.jpg"
+      },
+      {
+        "type": "walking_smoking",
+        "track_id": 1593,
+        "start_frame": 8164,
+        "end_frame": 8167,
+        "confidence": 0.72,
+        "start_time": 272.13,
+        "end_time": 272.23,
+        "snapshot": "assets/img/events/kabukicho_5m_night_event_6.jpg"
+      }
+    ],
     "location": {
       "lat": 35.6938,
       "lon": 139.7034,

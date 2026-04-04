@@ -90,9 +90,35 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
         union = area_a + area_b - inter
         return inter / union if union > 0 else 0.0
 
+    def _check_cigarette_near_person(self, track: Track,
+                                     cigarette_detections: list) -> bool:
+        """Check if a cigarette detection overlaps with a person's upper body."""
+        if not cigarette_detections:
+            return False
+
+        person_h = track.bbox[3] - track.bbox[1]
+        # Upper body region (top 50%)
+        upper_body = np.array([
+            track.bbox[0], track.bbox[1],
+            track.bbox[2], track.bbox[1] + person_h * 0.5,
+        ])
+
+        for cig in cigarette_detections:
+            # Check if cigarette bbox overlaps with upper body
+            iou = self._bbox_iou(upper_body, cig.bbox)
+            if iou > 0.0:
+                return True
+            # Also check proximity (cigarette center within person bbox)
+            cx, cy = cig.center
+            if (track.bbox[0] <= cx <= track.bbox[2]
+                    and track.bbox[1] <= cy <= track.bbox[1] + person_h * 0.6):
+                return True
+        return False
+
     def update(self, frame_idx: int, tracks: list[Track],
                all_detections: list[Detection],
-               pose_detections: list | None = None) -> list[ViolationEvent]:
+               pose_detections: list | None = None,
+               cigarette_detections: list | None = None) -> list[ViolationEvent]:
         if not self.enabled:
             return []
 
@@ -103,8 +129,11 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
             if track.speed < self.speed_threshold:
                 continue
 
-            # Use pose-based detection if available, otherwise proxy
-            if pose_detections:
+            # Priority: cigarette model > pose > proxy
+            if cigarette_detections:
+                smoking_pose = self._check_cigarette_near_person(
+                    track, cigarette_detections)
+            elif pose_detections:
                 smoking_pose = self._check_smoking_pose(track, pose_detections)
             else:
                 smoking_pose = self._check_smoking_proxy(track, all_detections)
@@ -122,8 +151,10 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
             if (len(frames) >= self.min_duration
                     and track.track_id not in self._reported):
                 conf = compute_confidence(frames)
-                # Boost confidence when using pose-based detection
-                if pose_detections:
+                # Boost confidence for more reliable detection methods
+                if cigarette_detections:
+                    conf = min(0.98, conf + 0.10)
+                elif pose_detections:
                     conf = min(0.98, conf + 0.05)
                 if conf >= self.confidence_threshold:
                     event = ViolationEvent(

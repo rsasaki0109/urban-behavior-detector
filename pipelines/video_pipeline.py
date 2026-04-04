@@ -14,6 +14,7 @@ from behaviors.sidewalk_riding import SidewalkRidingAnalyzer
 from behaviors.signal_violation import SignalViolationAnalyzer
 from behaviors.walking_smoking import WalkingSmokingAnalyzer
 from behaviors.wrong_way import WrongWayAnalyzer
+from detectors.cigarette_detector import CigaretteDetector
 from detectors.pose_detector import PoseDetector
 from detectors.signal_detector import SignalDetection, classify_signal_color
 from detectors.yolo_detector import Detection, YOLODetector
@@ -60,6 +61,15 @@ class VideoPipeline:
             self.pose_detector = PoseDetector(
                 model_path=pose_model,
                 confidence=det_cfg.get("confidence", 0.4),
+            )
+
+        # Cigarette detector (optional, most accurate smoking detection)
+        self.cigarette_detector = None
+        cig_model = det_cfg.get("cigarette_model")
+        if cig_model:
+            self.cigarette_detector = CigaretteDetector(
+                model_path=cig_model,
+                confidence=det_cfg.get("cigarette_confidence", 0.25),
             )
 
         self.analyzers = []
@@ -114,6 +124,11 @@ class VideoPipeline:
             if self.pose_detector:
                 pose_detections = self.pose_detector.detect(frame)
 
+            # Cigarette detection (optional)
+            cigarette_detections = None
+            if self.cigarette_detector:
+                cigarette_detections = self.cigarette_detector.detect(frame)
+
             # Signal color classification
             signal_detections = None
             traffic_lights = [d for d in detections if d.class_name == "traffic light"]
@@ -135,7 +150,8 @@ class VideoPipeline:
             frame_events = []
             for analyzer in self.analyzers:
                 if isinstance(analyzer, WalkingSmokingAnalyzer):
-                    events = analyzer.update(frame_idx, tracks, detections, pose_detections)
+                    events = analyzer.update(frame_idx, tracks, detections,
+                                             pose_detections, cigarette_detections)
                 elif isinstance(analyzer, SignalViolationAnalyzer):
                     events = analyzer.update(frame_idx, tracks, detections, signal_detections)
                 else:
@@ -143,8 +159,9 @@ class VideoPipeline:
                 frame_events.extend(events)
                 all_events.extend(events)
 
-            # Draw annotations
-            annotated = self._draw_frame(frame, detections, tracks, frame_events, frame_idx)
+            # Draw annotations (include cigarette boxes)
+            annotated = self._draw_frame(frame, detections, tracks, frame_events, frame_idx,
+                                         cigarette_detections)
             if writer:
                 writer.write(annotated)
 
@@ -262,13 +279,18 @@ class VideoPipeline:
                         for d in traffic_lights
                     ]
 
+                cigarette_detections = None
+                if self.cigarette_detector:
+                    cigarette_detections = self.cigarette_detector.detect(frame)
+
                 trackable = [d for d in detections if d.class_name in ("person", "bicycle")]
                 tracks = self.tracker.update(trackable)
 
                 frame_events = []
                 for analyzer in self.analyzers:
                     if isinstance(analyzer, WalkingSmokingAnalyzer):
-                        events = analyzer.update(frame_idx, tracks, detections, pose_detections)
+                        events = analyzer.update(frame_idx, tracks, detections,
+                                                 pose_detections, cigarette_detections)
                     elif isinstance(analyzer, SignalViolationAnalyzer):
                         events = analyzer.update(frame_idx, tracks, detections, signal_detections)
                     else:
@@ -333,7 +355,8 @@ class VideoPipeline:
 
     def _draw_frame(self, frame: np.ndarray, detections: list[Detection],
                     tracks: list, events: list[ViolationEvent],
-                    frame_idx: int) -> np.ndarray:
+                    frame_idx: int,
+                    cigarette_detections: list | None = None) -> np.ndarray:
         """Draw bounding boxes, track IDs, and violation alerts."""
         out = frame.copy()
 
@@ -344,6 +367,15 @@ class VideoPipeline:
                 cv2.rectangle(out, (x1, y1), (x2, y2), (128, 128, 128), 1)
                 cv2.putText(out, det.class_name, (x1, y1 - 4),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.4, (128, 128, 128), 1)
+
+        # Draw cigarette detections (red boxes)
+        if cigarette_detections:
+            for cig in cigarette_detections:
+                x1, y1, x2, y2 = cig.bbox.astype(int)
+                cv2.rectangle(out, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                cv2.putText(out, f"cigarette {cig.confidence:.2f}",
+                            (x1, y1 - 4), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.4, (0, 0, 255), 1)
 
         # Draw tracked objects
         for track in tracks:

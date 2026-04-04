@@ -41,6 +41,8 @@ detection:
   classes: [0, 1, 9, 25, 26, 27, 39, 67]
   use_pose: true
   pose_model: "yolov8n-pose.pt"
+  cigarette_model: "models/cigarette_yolov11m.pt"
+  cigarette_confidence: 0.25
 
 tracking:
   max_age: 30
