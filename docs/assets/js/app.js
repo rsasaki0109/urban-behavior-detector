@@ -160,6 +160,11 @@
           <span class="event-conf">${(e.confidence * 100).toFixed(0)}%</span>
         </div>
         ${e.snapshot ? `<div class="event-snapshot-wrapper"><img class="event-snapshot" src="${e.snapshot}" alt="Detection frame" loading="lazy"></div>` : ''}
+        ${e.vlm_evaluation ? `<div class="vlm-eval">
+          <span class="vlm-icon">${e.vlm_evaluation.smoking_detected ? '&#9989;' : '&#10060;'}</span>
+          <span class="vlm-label">VLM:</span>
+          <span class="vlm-desc">${e.vlm_evaluation.description || ''}</span>
+        </div>` : ''}
       </div>
     `).join('');
 

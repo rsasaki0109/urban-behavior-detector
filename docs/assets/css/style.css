@@ -446,6 +446,22 @@ nav .container {
   border-radius: 6px;
 }
 
+.vlm-eval {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(56, 189, 248, 0.06);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.vlm-icon { font-size: 0.8rem; }
+.vlm-label { font-weight: 600; color: var(--accent); white-space: nowrap; }
+.vlm-desc { line-height: 1.4; }
+
 .event-badge {
   padding: 3px 8px;
   border-radius: 6px;
