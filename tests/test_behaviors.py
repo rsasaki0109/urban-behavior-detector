@@ -15,7 +15,6 @@ def _make_track(track_id, class_name, bbox, speed_val=0.0):
     centers = []
     center = np.array([(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2])
     if speed_val > 0:
-        # Create history that produces the desired speed
         for i in range(6):
             centers.append(np.array([center[0] - speed_val * (5 - i), center[1]]))
     else:
@@ -75,7 +74,6 @@ class TestBboxOverlapRatio:
     def test_partial_overlap(self):
         a = np.array([0, 0, 10, 10])
         b = np.array([5, 0, 15, 10])
-        # intersection = 5*10=50, area_b = 10*10=100
         assert abs(_bbox_overlap_ratio(a, b) - 0.5) < 1e-6
 
     def test_zero_area_b(self):
@@ -89,66 +87,76 @@ class TestBboxOverlapRatio:
 class TestWalkingSmokingAnalyzer:
     DEFAULT_CONFIG = {
         "enabled": True,
-        "hand_mouth_distance": 0.12,
         "speed_threshold": 1.5,
-        "min_duration_frames": 8,
-        "confidence_threshold": 0.5,
+        "min_duration_frames": 5,
+        "confidence_threshold": 0.4,
+        "pose_wrist_nose_ratio": 0.15,
+        "min_oscillations": 2,
     }
 
     def test_disabled(self):
         analyzer = WalkingSmokingAnalyzer({"enabled": False})
         track = _make_track(1, "person", [100, 100, 200, 300], speed_val=3.0)
-        det = _make_detection("bottle", [140, 130, 150, 140])
-        events = analyzer.update(0, [track], [det])
+        events = analyzer.update(0, [track], [])
         assert events == []
 
     def test_no_violation_stationary_person(self):
+        """Stationary person should never trigger."""
         analyzer = WalkingSmokingAnalyzer(self.DEFAULT_CONFIG)
         track = _make_track(1, "person", [100, 100, 200, 300], speed_val=0.0)
-        det = _make_detection("bottle", [140, 130, 150, 140])
-        for i in range(20):
-            events = analyzer.update(i, [track], [det])
-        assert events == []
+        for i in range(30):
+            analyzer.update(i, [track], [])
+        assert analyzer.finalize() == []
 
-    def test_violation_detected(self):
-        """Walking person with small object near mouth triggers violation."""
+    def test_cigarette_near_person_triggers(self):
+        """Cigarette detection near walking person triggers violation."""
+        from detectors.cigarette_detector import CigaretteDetection
         analyzer = WalkingSmokingAnalyzer(self.DEFAULT_CONFIG)
-        # Person bbox: [100, 100, 200, 300] -> height=200
-        # Mouth region: y=[100+200*0.15, 100+200*0.30] = [130, 160]
-        #               x=[100+100*0.2, 200-100*0.2] = [120, 180]
         track = _make_track(1, "person", [100, 100, 200, 300], speed_val=3.0)
-        # Small bottle near mouth area
-        det = _make_detection("bottle", [145, 140, 155, 150])
+
+        cig = CigaretteDetection(
+            bbox=np.array([140, 130, 160, 150], dtype=float),
+            confidence=0.5,
+        )
 
         all_events = []
-        for i in range(15):
-            events = analyzer.update(i, [track], [det])
+        for i in range(10):
+            events = analyzer.update(i, [track], [],
+                                     cigarette_detections=[cig])
             all_events.extend(events)
 
         assert len(all_events) == 1
         assert all_events[0].violation_type == "walking_smoking"
-        assert all_events[0].track_id == 1
 
     def test_no_duplicate_reports(self):
         """Same track should only be reported once."""
+        from detectors.cigarette_detector import CigaretteDetection
         analyzer = WalkingSmokingAnalyzer(self.DEFAULT_CONFIG)
         track = _make_track(1, "person", [100, 100, 200, 300], speed_val=3.0)
-        det = _make_detection("bottle", [145, 140, 155, 150])
+        cig = CigaretteDetection(
+            bbox=np.array([140, 130, 160, 150], dtype=float),
+            confidence=0.5,
+        )
 
         event_count = 0
         for i in range(30):
-            events = analyzer.update(i, [track], [det])
+            events = analyzer.update(i, [track], [],
+                                     cigarette_detections=[cig])
             event_count += len(events)
 
         assert event_count == 1
 
     def test_finalize_returns_all_events(self):
+        from detectors.cigarette_detector import CigaretteDetection
         analyzer = WalkingSmokingAnalyzer(self.DEFAULT_CONFIG)
         track = _make_track(1, "person", [100, 100, 200, 300], speed_val=3.0)
-        det = _make_detection("bottle", [145, 140, 155, 150])
+        cig = CigaretteDetection(
+            bbox=np.array([140, 130, 160, 150], dtype=float),
+            confidence=0.5,
+        )
 
-        for i in range(15):
-            analyzer.update(i, [track], [det])
+        for i in range(10):
+            analyzer.update(i, [track], [], cigarette_detections=[cig])
 
         events = analyzer.finalize()
         assert len(events) == 1
@@ -179,10 +187,8 @@ class TestBicycleViolationAnalyzer:
     def test_phone_violation(self):
         """Cyclist with phone near face triggers bicycle_phone."""
         analyzer = BicycleViolationAnalyzer(self.PHONE_CONFIG, {"enabled": False})
-        # Person on bicycle
         person = _make_track(1, "person", [100, 100, 200, 300], speed_val=5.0)
         bike = _make_track(2, "bicycle", [90, 200, 210, 320], speed_val=5.0)
-        # Phone near face (upper 35% of person: y=100 to 170)
         phone_det = _make_detection("cell phone", [140, 120, 160, 145])
 
         all_events = []
@@ -198,7 +204,6 @@ class TestBicycleViolationAnalyzer:
         analyzer = BicycleViolationAnalyzer({"enabled": False}, self.UMBRELLA_CONFIG)
         person = _make_track(1, "person", [100, 100, 200, 300], speed_val=5.0)
         bike = _make_track(2, "bicycle", [90, 200, 210, 320], speed_val=5.0)
-        # Large umbrella overlapping person
         umbrella_det = _make_detection("umbrella", [80, 80, 220, 200])
 
         all_events = []
@@ -270,7 +275,6 @@ class TestWrongWayAnalyzer:
     def test_correct_direction_no_violation(self):
         """Bicycle moving right (expected direction) should not trigger."""
         analyzer = WrongWayAnalyzer(self.DEFAULT_CONFIG)
-        # Moving right: x increasing
         points = [[100 + i * 5, 150] for i in range(6)]
         track = _make_bicycle_track(1, [100, 100, 200, 200], points)
 
@@ -284,7 +288,6 @@ class TestWrongWayAnalyzer:
     def test_wrong_way_detected(self):
         """Bicycle moving left when expected right should trigger."""
         analyzer = WrongWayAnalyzer(self.DEFAULT_CONFIG)
-        # Moving left: x decreasing (direction ~180 degrees)
         points = [[200 - i * 5, 150] for i in range(6)]
         track = _make_bicycle_track(1, [100, 100, 200, 200], points)
 
