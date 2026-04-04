@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Behavior Detector</title>
+  <meta name="description" content="Detect urban violations (walking smoking, bicycle infractions) from video using YOLO + rule-based behavior analysis. Open source.">
+  <!-- OGP -->
+  <meta property="og:title" content="Urban Behavior Detector">
+  <meta property="og:description" content="Detect urban violations from video using YOLO + rule-based behavior analysis. Open source.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Favicon (SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128065;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="container">
+    <a href="#" class="nav-brand"><span>//</span> urban-behavior-detector</a>
+    <ul class="nav-links">
+      <li><a href="#violations">Violations</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#demo">Demo</a></li>
+      <li><a href="#heatmap">Heatmap</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="https://github.com/rsasaki0109/urban-behavior-detector" class="btn btn-secondary" style="padding:6px 14px;">GitHub</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>Detect <span>Urban Violations</span><br>from Video</h1>
+    <p class="hero-sub">
+      Walking smoking, bicycle infractions &mdash; detected from live camera feeds
+      using YOLO + rule-based behavior analysis. Open source.
+    </p>
+    <div class="hero-actions">
+      <a href="#demo" class="btn btn-primary">View Demo</a>
+      <a href="https://github.com/rsasaki0109/urban-behavior-detector" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Supported Violations -->
+<section id="violations">
+  <div class="container">
+    <p class="section-label">Detection Targets</p>
+    <h2>Supported Violations</h2>
+    <p class="section-desc">
+      Rule-based behavior analysis layered on top of object detection and tracking.
+      Each violation type is independently configurable.
+    </p>
+    <div class="card-grid">
+      <div class="card violation-smoking">
+        <div class="card-icon">&#128684;</div>
+        <h3>Walking Smoking</h3>
+        <p>Detects pedestrians smoking while walking by analyzing hand-to-mouth proximity, movement speed, and duration of the behavior pattern.</p>
+      </div>
+      <div class="card violation-phone">
+        <div class="card-icon">&#128241;</div>
+        <h3>Bicycle + Phone</h3>
+        <p>Identifies cyclists using a smartphone while riding by detecting phone proximity to the rider's face region.</p>
+      </div>
+      <div class="card violation-umbrella">
+        <div class="card-icon">&#9748;</div>
+        <h3>Bicycle + Umbrella</h3>
+        <p>Detects cyclists riding with an open umbrella by checking for umbrella overlap with the cyclist's bounding box.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it Works -->
+<section id="how-it-works">
+  <div class="container">
+    <p class="section-label">Architecture</p>
+    <h2>How it works</h2>
+    <p class="section-desc">
+      A four-stage pipeline processes each video frame. All thresholds and rules are
+      externalized to a YAML config file.
+    </p>
+    <div class="pipeline-flow">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <h3>Detection</h3>
+        <p>YOLOv8 detects persons, bicycles, phones, umbrellas, and other objects in each frame.</p>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <h3>Tracking</h3>
+        <p>IoU-based SORT tracker assigns persistent IDs to detected objects across frames.</p>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <h3>Behavior Analysis</h3>
+        <p>Rule-based analyzers evaluate spatial relationships, movement patterns, and temporal persistence.</p>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <h3>Output</h3>
+        <p>Violations are logged as structured JSON events and overlaid on the output video.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Demo -->
+<section id="demo">
+  <div class="container">
+    <p class="section-label">Live Results</p>
+    <h2>Demo</h2>
+    <p class="section-desc">
+      Sample detection results from the pipeline. Select a video to view detected events.
+    </p>
+
+    <div id="demo-tabs" class="demo-tabs"></div>
+
+    <div class="demo-container">
+      <div id="video-area" class="video-container">
+        <video id="demo-video" class="demo-video" controls preload="metadata" style="display:none;"></video>
+        <div id="video-placeholder" class="video-placeholder">
+          <div>&#9654;</div>
+          <div>Loading...</div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline">
+        <div id="timeline-bar" class="timeline-bar"></div>
+        <div id="timeline-labels" class="timeline-labels">
+          <span>0:00</span><span>0:30</span>
+        </div>
+        <div class="timeline-legend">
+          <div class="legend-item"><span class="legend-dot walking_smoking"></span> Walking Smoking</div>
+          <div class="legend-item"><span class="legend-dot bicycle_phone"></span> Bicycle Phone</div>
+          <div class="legend-item"><span class="legend-dot bicycle_umbrella"></span> Bicycle Umbrella</div>
+          <div class="legend-item"><span class="legend-dot bicycle_wrong_way"></span> Wrong Way</div>
+          <div class="legend-item"><span class="legend-dot signal_violation"></span> Red Light</div>
+          <div class="legend-item"><span class="legend-dot sidewalk_riding"></span> Sidewalk</div>
+        </div>
+      </div>
+
+      <!-- Filter + Event Log -->
+      <div class="event-log">
+        <div class="event-log-header">
+          <span>Detected Events</span>
+          <span id="event-count" class="event-count">0 events</span>
+        </div>
+        <div id="event-filters" class="event-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="walking_smoking">Walking Smoking</button>
+          <button class="filter-btn" data-filter="bicycle_phone">Bicycle Phone</button>
+          <button class="filter-btn" data-filter="bicycle_umbrella">Bicycle Umbrella</button>
+          <button class="filter-btn" data-filter="bicycle_wrong_way">Wrong Way</button>
+          <button class="filter-btn" data-filter="signal_violation">Red Light</button>
+          <button class="filter-btn" data-filter="sidewalk_riding">Sidewalk</button>
+        </div>
+        <div id="event-list" class="event-list"></div>
+      </div>
+
+      <!-- Stats Summary -->
+      <div id="stats-summary" class="stats-summary">
+        <div class="stats-header">Statistics</div>
+        <div id="stats-body" class="stats-body"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JSON Preview -->
+<section id="json-preview">
+  <div class="container">
+    <p class="section-label">Output Format</p>
+    <h2>JSON Preview</h2>
+    <p class="section-desc">
+      Each run produces a structured JSON file with all detected violation events.
+    </p>
+    <div class="json-preview">
+      <div class="json-header">
+        <span>events.json</span>
+        <span style="font-size:0.7rem;color:var(--text-muted);">auto-generated</span>
+      </div>
+      <div id="json-body" class="json-body">
+        <pre>Loading...</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Heatmap -->
+<section id="heatmap">
+  <div class="container">
+    <p class="section-label">City-Scale Analysis</p>
+    <h2>Violation Heatmap</h2>
+    <p class="section-desc">
+      Geo-referenced violations from multiple camera locations. Click a marker for details.
+    </p>
+    <div id="heatmap-container" class="heatmap-container">
+      <div id="map" style="width:100%;height:450px;border-radius:12px;"></div>
+    </div>
+    <div class="heatmap-legend">
+      <div class="legend-item"><span class="legend-dot walking_smoking"></span> Walking Smoking</div>
+      <div class="legend-item"><span class="legend-dot bicycle_phone"></span> Bicycle Phone</div>
+      <div class="legend-item"><span class="legend-dot bicycle_umbrella"></span> Bicycle Umbrella</div>
+      <div class="legend-item"><span class="legend-dot bicycle_wrong_way"></span> Wrong Way</div>
+      <div class="legend-item"><span class="legend-dot signal_violation"></span> Red Light</div>
+      <div class="legend-item"><span class="legend-dot sidewalk_riding"></span> Sidewalk</div>
+    </div>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section id="roadmap">
+  <div class="container">
+    <p class="section-label">What's Next</p>
+    <h2>Roadmap</h2>
+    <p class="section-desc">
+      Planned improvements and extensions.
+    </p>
+    <div class="roadmap-grid">
+      <div class="roadmap-item">
+        <div class="roadmap-status status-done">Shipped</div>
+        <h4>Core pipeline</h4>
+        <p>YOLO detection, SORT tracking, rule-based violation analysis, JSON + video output.</p>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status status-done">Shipped</div>
+        <h4>Signal violation detection</h4>
+        <p>Detect bicycles running red lights using traffic signal state recognition.</p>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status status-done">Shipped</div>
+        <h4>Wrong-way cycling</h4>
+        <p>Detect bicycles traveling against the expected traffic direction.</p>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status status-done">Shipped</div>
+        <h4>Sidewalk cycling</h4>
+        <p>Detect bicycles on pedestrian sidewalks using ROI-based zone detection.</p>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status status-planned">Planned</div>
+        <h4>Pose-based smoking</h4>
+        <p>Replace proxy-object heuristics with keypoint-based hand-to-mouth detection.</p>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status status-done">Shipped</div>
+        <h4>Map integration</h4>
+        <p>Geo-referenced violation heatmaps for city-scale analysis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>urban-behavior-detector &mdash; open-source urban violation detection</p>
+    <p style="margin-top:6px;">
+      <a href="https://github.com/rsasaki0109/urban-behavior-detector">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/js/heatmap.js"></script>
+</body>
+</html>

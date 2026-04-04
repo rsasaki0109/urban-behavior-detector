@@ -1,0 +1,17 @@
+{
+  "points": [
+    {"lat": 35.6812, "lon": 139.7671, "type": "walking_smoking", "confidence": 0.71, "video_id": "sample_crosswalk", "location_name": "Shibuya Crossing"},
+    {"lat": 35.6812, "lon": 139.7671, "type": "walking_smoking", "confidence": 0.82, "video_id": "sample_crosswalk", "location_name": "Shibuya Crossing"},
+    {"lat": 35.6812, "lon": 139.7671, "type": "bicycle_phone", "confidence": 0.68, "video_id": "sample_crosswalk", "location_name": "Shibuya Crossing"},
+    {"lat": 35.6585, "lon": 139.7013, "type": "walking_smoking", "confidence": 0.75, "video_id": "sample_station", "location_name": "Shinjuku Station"},
+    {"lat": 35.6585, "lon": 139.7013, "type": "bicycle_umbrella", "confidence": 0.64, "video_id": "sample_station", "location_name": "Shinjuku Station"},
+    {"lat": 35.6585, "lon": 139.7013, "type": "bicycle_phone", "confidence": 0.73, "video_id": "sample_station", "location_name": "Shinjuku Station"},
+    {"lat": 35.6585, "lon": 139.7013, "type": "walking_smoking", "confidence": 0.88, "video_id": "sample_station", "location_name": "Shinjuku Station"},
+    {"lat": 35.6762, "lon": 139.6503, "type": "bicycle_wrong_way", "confidence": 0.72, "video_id": "shimokitazawa", "location_name": "Shimokitazawa"},
+    {"lat": 35.6762, "lon": 139.6503, "type": "walking_smoking", "confidence": 0.65, "video_id": "shimokitazawa", "location_name": "Shimokitazawa"},
+    {"lat": 35.7101, "lon": 139.8107, "type": "signal_violation", "confidence": 0.78, "video_id": "asakusa", "location_name": "Asakusa"},
+    {"lat": 35.7101, "lon": 139.8107, "type": "sidewalk_riding", "confidence": 0.69, "video_id": "asakusa", "location_name": "Asakusa"},
+    {"lat": 35.6684, "lon": 139.7003, "type": "walking_smoking", "confidence": 0.91, "video_id": "harajuku", "location_name": "Harajuku"}
+  ],
+  "total": 12
+}

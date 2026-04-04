@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+outputs/
+docs/
+.github/
+tests/
+*.pt
+.venv/
+PLAN.md
