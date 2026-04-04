@@ -1,0 +1,53 @@
+# Pose-based detection config
+# Uses YOLOv8-pose keypoints for accurate wrist-to-nose smoking detection
+
+walking_smoking:
+  enabled: true
+  hand_mouth_distance: 0.12
+  speed_threshold: 0.8
+  min_duration_frames: 5
+  confidence_threshold: 0.4
+  pose_wrist_nose_ratio: 0.12
+
+bicycle_phone:
+  enabled: true
+  phone_near_face_threshold: 0.15
+  min_duration_frames: 5
+  confidence_threshold: 0.4
+
+bicycle_umbrella:
+  enabled: true
+  umbrella_overlap_threshold: 0.3
+  min_duration_frames: 4
+  confidence_threshold: 0.4
+
+bicycle_wrong_way:
+  enabled: false
+  expected_direction: "right"
+  angle_tolerance: 45
+  min_duration_frames: 8
+  confidence_threshold: 0.5
+
+signal_violation:
+  enabled: false
+
+sidewalk_riding:
+  enabled: false
+
+detection:
+  model: "yolov8n.pt"
+  confidence: 0.35
+  iou_threshold: 0.5
+  classes: [0, 1, 9, 25, 26, 27, 39, 67]
+  use_pose: true
+  pose_model: "yolov8n-pose.pt"
+
+tracking:
+  max_age: 30
+  min_hits: 2
+  iou_threshold: 0.3
+
+location:
+  lat: 35.6938
+  lon: 139.7034
+  name: "Kabukicho, Shinjuku"

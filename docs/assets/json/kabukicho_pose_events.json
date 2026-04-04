@@ -1,0 +1,23 @@
+{
+  "video_id": "kabukicho_3m",
+  "video_file": "kabukicho_3m.mp4",
+  "fps": 30.0,
+  "total_frames": 5400,
+  "resolution": "854x480",
+  "events": [
+    {
+      "type": "walking_smoking",
+      "track_id": 130,
+      "start_frame": 784,
+      "end_frame": 790,
+      "confidence": 0.77,
+      "start_time": 26.13,
+      "end_time": 26.33
+    }
+  ],
+  "location": {
+    "lat": 35.6938,
+    "lon": 139.7034,
+    "name": "Kabukicho, Shinjuku"
+  }
+}

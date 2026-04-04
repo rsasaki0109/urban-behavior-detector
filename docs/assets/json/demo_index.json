@@ -8,48 +8,12 @@
     "events": [
       {
         "type": "walking_smoking",
-        "track_id": 214,
-        "start_frame": 1464,
-        "end_frame": 1466,
-        "confidence": 0.69,
-        "start_time": 48.8,
-        "end_time": 48.87
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 361,
-        "start_frame": 2136,
-        "end_frame": 2138,
-        "confidence": 0.69,
-        "start_time": 71.2,
-        "end_time": 71.27
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 399,
-        "start_frame": 2536,
-        "end_frame": 2539,
-        "confidence": 0.67,
-        "start_time": 84.53,
-        "end_time": 84.63
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 473,
-        "start_frame": 3024,
-        "end_frame": 3026,
-        "confidence": 0.69,
-        "start_time": 100.8,
-        "end_time": 100.87
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 662,
-        "start_frame": 5225,
-        "end_frame": 5227,
-        "confidence": 0.69,
-        "start_time": 174.17,
-        "end_time": 174.23
+        "track_id": 130,
+        "start_frame": 784,
+        "end_frame": 790,
+        "confidence": 0.77,
+        "start_time": 26.13,
+        "end_time": 26.33
       }
     ],
     "location": {
