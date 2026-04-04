@@ -4,18 +4,7 @@
   "fps": 30.0,
   "total_frames": 5400,
   "resolution": "854x480",
-  "events": [
-    {
-      "type": "walking_smoking",
-      "track_id": 130,
-      "start_frame": 784,
-      "end_frame": 790,
-      "confidence": 0.77,
-      "start_time": 26.13,
-      "end_time": 26.33,
-      "snapshot": "assets/img/events/kabukicho_3m_event_0.jpg"
-    }
-  ],
+  "events": [],
   "location": {
     "lat": 35.6938,
     "lon": 139.7034,
