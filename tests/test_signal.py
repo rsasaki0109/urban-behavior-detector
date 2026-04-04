@@ -128,3 +128,24 @@ class TestSignalViolationAnalyzer:
         track = _make_bicycle_track(1, [100, 100, 200, 200])
         events = analyzer.update(0, [track], [], None)
         assert events == []
+
+    def test_pedestrian_red_light(self):
+        """Walking person crossing on red should trigger."""
+        config = {**self.CONFIG, "detect_pedestrians": True}
+        analyzer = SignalViolationAnalyzer(config)
+        center = np.array([150.0, 150.0])
+        person = Track(
+            track_id=1, class_name="person",
+            bbox=np.array([100, 100, 200, 200], dtype=float),
+            center=center, hits=5,
+            history=[np.array([150.0 - 5 * (5 - i), 150.0]) for i in range(6)],
+        )
+        signal = _make_signal([130, 50, 170, 90], SignalColor.RED)
+
+        all_events = []
+        for i in range(10):
+            events = analyzer.update(i, [person], [], [signal])
+            all_events.extend(events)
+
+        assert len(all_events) == 1
+        assert all_events[0].violation_type == "signal_violation"

@@ -12,6 +12,7 @@ from behaviors.base import ViolationEvent
 from behaviors.bicycle_violation import BicycleViolationAnalyzer
 from behaviors.sidewalk_riding import SidewalkRidingAnalyzer
 from behaviors.signal_violation import SignalViolationAnalyzer
+from behaviors.walking_phone import WalkingPhoneAnalyzer
 from behaviors.walking_smoking import WalkingSmokingAnalyzer
 from behaviors.wrong_way import WrongWayAnalyzer
 from detectors.cigarette_detector import CigaretteDetector
@@ -28,6 +29,7 @@ VIOLATION_COLORS = {
     "bicycle_wrong_way": (255, 0, 255),   # Magenta
     "signal_violation": (0, 0, 200),      # Dark Red
     "sidewalk_riding": (255, 128, 0),     # Cyan-ish
+    "walking_phone": (255, 200, 50),      # Light blue
 }
 
 
@@ -85,6 +87,8 @@ class VideoPipeline:
             self.analyzers.append(SignalViolationAnalyzer(self.config["signal_violation"]))
         if self.config.get("sidewalk_riding", {}).get("enabled", False):
             self.analyzers.append(SidewalkRidingAnalyzer(self.config["sidewalk_riding"]))
+        if self.config.get("walking_phone", {}).get("enabled", False):
+            self.analyzers.append(WalkingPhoneAnalyzer(self.config["walking_phone"]))
 
     def process_video(self, video_path: str, output_video: str | None = None,
                       output_json: str | None = None) -> list[dict]:
@@ -152,6 +156,8 @@ class VideoPipeline:
                 if isinstance(analyzer, WalkingSmokingAnalyzer):
                     events = analyzer.update(frame_idx, tracks, detections,
                                              pose_detections, cigarette_detections)
+                elif isinstance(analyzer, WalkingPhoneAnalyzer):
+                    events = analyzer.update(frame_idx, tracks, detections, pose_detections)
                 elif isinstance(analyzer, SignalViolationAnalyzer):
                     events = analyzer.update(frame_idx, tracks, detections, signal_detections)
                 else:
@@ -291,6 +297,8 @@ class VideoPipeline:
                     if isinstance(analyzer, WalkingSmokingAnalyzer):
                         events = analyzer.update(frame_idx, tracks, detections,
                                                  pose_detections, cigarette_detections)
+                    elif isinstance(analyzer, WalkingPhoneAnalyzer):
+                        events = analyzer.update(frame_idx, tracks, detections, pose_detections)
                     elif isinstance(analyzer, SignalViolationAnalyzer):
                         events = analyzer.update(frame_idx, tracks, detections, signal_detections)
                     else:
