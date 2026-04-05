@@ -154,26 +154,34 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
 
             smoking_detected = False
 
-            # Method 1: Pose oscillation (most reliable for smoking vs phone)
+            has_oscillation = False
+            has_cigarette = False
+
+            # Check pose oscillation (hand-to-mouth pattern)
             if pose_detections:
                 dist = self._get_wrist_nose_distance(track, pose_detections)
                 if dist is not None:
                     self._distance_history[track.track_id].append((frame_idx, dist))
-                    # Prune old history
                     cutoff = frame_idx - 90  # ~3 seconds at 30fps
                     self._distance_history[track.track_id] = [
                         (f, d) for f, d in self._distance_history[track.track_id]
                         if f >= cutoff
                     ]
+                    has_oscillation = self._detect_oscillation(track.track_id)
 
-                    if self._detect_oscillation(track.track_id):
-                        smoking_detected = True
+            # Check cigarette object detection
+            if cigarette_detections:
+                has_cigarette = self._check_cigarette_near_person(
+                    track, cigarette_detections)
 
-            # Method 2: Cigarette object detection (supplementary)
-            if cigarette_detections and not smoking_detected:
-                if self._check_cigarette_near_person(track, cigarette_detections):
-                    # Cigarette detected near person + walking = likely smoking
-                    smoking_detected = True
+            # Decision logic:
+            # - Both cigarette + oscillation = high confidence
+            # - Cigarette only = medium (object visible)
+            # - Oscillation only = not enough (too many false positives)
+            if has_cigarette and has_oscillation:
+                smoking_detected = True
+            elif has_cigarette:
+                smoking_detected = True
 
             if smoking_detected:
                 self._candidates[track.track_id].append(frame_idx)
@@ -186,6 +194,10 @@ class WalkingSmokingAnalyzer(BehaviorAnalyzer):
             if (len(frames) >= self.min_duration
                     and track.track_id not in self._reported):
                 conf = compute_confidence(frames)
+                if has_cigarette and has_oscillation:
+                    conf = min(0.98, conf + 0.15)
+                elif has_cigarette:
+                    conf = min(0.95, conf + 0.05)
                 if conf >= self.confidence_threshold:
                     event = ViolationEvent(
                         violation_type="walking_smoking",

@@ -8,153 +8,43 @@
     "events": [
       {
         "type": "walking_smoking",
-        "track_id": 135,
-        "start_frame": 674,
-        "end_frame": 681,
-        "confidence": 0.71,
-        "start_time": 22.47,
-        "end_time": 22.7,
+        "track_id": 1014,
+        "start_frame": 5224,
+        "end_frame": 5227,
+        "confidence": 0.77,
+        "start_time": 174.13,
+        "end_time": 174.23,
         "snapshot": "assets/img/events/kabukicho_5m_night_event_0.jpg"
       },
       {
         "type": "walking_smoking",
-        "track_id": 404,
-        "start_frame": 2134,
-        "end_frame": 2138,
-        "confidence": 0.75,
-        "start_time": 71.13,
-        "end_time": 71.27,
+        "track_id": 1049,
+        "start_frame": 5224,
+        "end_frame": 5227,
+        "confidence": 0.77,
+        "start_time": 174.13,
+        "end_time": 174.23,
         "snapshot": "assets/img/events/kabukicho_5m_night_event_1.jpg"
       },
       {
         "type": "walking_smoking",
-        "track_id": 474,
-        "start_frame": 2448,
-        "end_frame": 2452,
-        "confidence": 0.75,
-        "start_time": 81.6,
-        "end_time": 81.73,
+        "track_id": 1255,
+        "start_frame": 6633,
+        "end_frame": 6638,
+        "confidence": 0.74,
+        "start_time": 221.1,
+        "end_time": 221.27,
         "snapshot": "assets/img/events/kabukicho_5m_night_event_2.jpg"
       },
       {
         "type": "walking_smoking",
-        "track_id": 820,
-        "start_frame": 4291,
-        "end_frame": 4300,
-        "confidence": 0.7,
-        "start_time": 143.03,
-        "end_time": 143.33,
+        "track_id": 1300,
+        "start_frame": 6840,
+        "end_frame": 6843,
+        "confidence": 0.77,
+        "start_time": 228.0,
+        "end_time": 228.1,
         "snapshot": "assets/img/events/kabukicho_5m_night_event_3.jpg"
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 1014,
-        "start_frame": 5212,
-        "end_frame": 5216,
-        "confidence": 0.75,
-        "start_time": 173.73,
-        "end_time": 173.87,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_4.jpg"
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 1239,
-        "start_frame": 6519,
-        "end_frame": 6525,
-        "confidence": 0.72,
-        "start_time": 217.3,
-        "end_time": 217.5,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_5.jpg"
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 1251,
-        "start_frame": 6576,
-        "end_frame": 6584,
-        "confidence": 0.71,
-        "start_time": 219.2,
-        "end_time": 219.47,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_6.jpg"
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 1610,
-        "start_frame": 8324,
-        "end_frame": 8329,
-        "confidence": 0.73,
-        "start_time": 277.47,
-        "end_time": 277.63,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_7.jpg"
-      },
-      {
-        "type": "walking_smoking",
-        "track_id": 1623,
-        "start_frame": 8343,
-        "end_frame": 8352,
-        "confidence": 0.7,
-        "start_time": 278.1,
-        "end_time": 278.4,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_8.jpg"
-      },
-      {
-        "type": "walking_phone",
-        "track_id": 474,
-        "start_frame": 2450,
-        "end_frame": 2465,
-        "confidence": 0.79,
-        "start_time": 81.67,
-        "end_time": 82.17,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_9.jpg"
-      },
-      {
-        "type": "walking_phone",
-        "track_id": 1014,
-        "start_frame": 5224,
-        "end_frame": 5231,
-        "confidence": 0.84,
-        "start_time": 174.13,
-        "end_time": 174.37,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_10.jpg"
-      },
-      {
-        "type": "walking_phone",
-        "track_id": 1251,
-        "start_frame": 6565,
-        "end_frame": 6577,
-        "confidence": 0.8,
-        "start_time": 218.83,
-        "end_time": 219.23,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_11.jpg"
-      },
-      {
-        "type": "walking_phone",
-        "track_id": 1297,
-        "start_frame": 7140,
-        "end_frame": 7149,
-        "confidence": 0.82,
-        "start_time": 238.0,
-        "end_time": 238.3,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_12.jpg"
-      },
-      {
-        "type": "walking_phone",
-        "track_id": 1623,
-        "start_frame": 8336,
-        "end_frame": 8353,
-        "confidence": 0.78,
-        "start_time": 277.87,
-        "end_time": 278.43,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_13.jpg"
-      },
-      {
-        "type": "walking_phone",
-        "track_id": 1610,
-        "start_frame": 8414,
-        "end_frame": 8431,
-        "confidence": 0.78,
-        "start_time": 280.47,
-        "end_time": 281.03,
-        "snapshot": "assets/img/events/kabukicho_5m_night_event_14.jpg"
       }
     ],
     "location": {
@@ -169,58 +59,7 @@
     "fps": 30.0,
     "total_frames": 3600,
     "resolution": "854x480",
-    "events": [
-      {
-        "type": "signal_violation",
-        "track_id": 17,
-        "start_frame": 1020,
-        "end_frame": 1022,
-        "confidence": 0.69,
-        "start_time": 34.0,
-        "end_time": 34.07,
-        "snapshot": "assets/img/events/sapporo_intersection_event_0.jpg"
-      },
-      {
-        "type": "signal_violation",
-        "track_id": 41,
-        "start_frame": 2800,
-        "end_frame": 2803,
-        "confidence": 0.67,
-        "start_time": 93.33,
-        "end_time": 93.43,
-        "snapshot": "assets/img/events/sapporo_intersection_event_1.jpg"
-      },
-      {
-        "type": "signal_violation",
-        "track_id": 45,
-        "start_frame": 2838,
-        "end_frame": 2840,
-        "confidence": 0.69,
-        "start_time": 94.6,
-        "end_time": 94.67,
-        "snapshot": "assets/img/events/sapporo_intersection_event_2.jpg"
-      },
-      {
-        "type": "signal_violation",
-        "track_id": 44,
-        "start_frame": 2841,
-        "end_frame": 2844,
-        "confidence": 0.67,
-        "start_time": 94.7,
-        "end_time": 94.8,
-        "snapshot": "assets/img/events/sapporo_intersection_event_3.jpg"
-      },
-      {
-        "type": "signal_violation",
-        "track_id": 48,
-        "start_frame": 3048,
-        "end_frame": 3058,
-        "confidence": 0.62,
-        "start_time": 101.6,
-        "end_time": 101.93,
-        "snapshot": "assets/img/events/sapporo_intersection_event_4.jpg"
-      }
-    ],
+    "events": [],
     "location": {
       "lat": 43.0618,
       "lon": 141.3545,

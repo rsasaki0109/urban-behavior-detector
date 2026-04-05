@@ -136,7 +136,10 @@ class WalkingPhoneAnalyzer(BehaviorAnalyzer):
 
             phone_detected = False
 
-            # Pose-based: hand constantly near face
+            has_constant_near = False
+            has_phone_object = False
+
+            # Check pose: hand constantly near face
             if pose_detections:
                 dist = self._get_wrist_nose_distance(track, pose_detections)
                 if dist is not None:
@@ -146,13 +149,18 @@ class WalkingPhoneAnalyzer(BehaviorAnalyzer):
                         (f, d) for f, d in self._distance_history[track.track_id]
                         if f >= cutoff
                     ]
-                    if self._detect_constant_near(track.track_id):
-                        phone_detected = True
+                    has_constant_near = self._detect_constant_near(track.track_id)
 
-            # Supplementary: cell phone object near face
-            if not phone_detected:
-                if self._check_phone_object_near_face(track, all_detections):
-                    phone_detected = True
+            # Check YOLO: cell phone object near face
+            has_phone_object = self._check_phone_object_near_face(
+                track, all_detections)
+
+            # Decision: require phone object detection (pose alone is not enough)
+            # - Phone object + constant near = high confidence
+            # - Phone object only = medium (object visible near face)
+            # - Constant near only = not enough (could be eating, scratching etc.)
+            if has_phone_object:
+                phone_detected = True
 
             if phone_detected:
                 self._candidates[track.track_id].append(frame_idx)
@@ -165,6 +173,8 @@ class WalkingPhoneAnalyzer(BehaviorAnalyzer):
             if (len(frames) >= self.min_duration
                     and track.track_id not in self._reported):
                 conf = compute_confidence(frames)
+                if has_phone_object and has_constant_near:
+                    conf = min(0.98, conf + 0.10)
                 if conf >= self.confidence_threshold:
                     event = ViolationEvent(
                         violation_type="walking_phone",

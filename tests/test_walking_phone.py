@@ -41,13 +41,12 @@ class TestWalkingPhoneAnalyzer:
         events = analyzer.update(0, [track], [])
         assert events == []
 
-    def test_constant_near_face_triggers(self):
-        """Hand constantly near face = phone usage, should trigger."""
+    def test_pose_alone_not_enough(self):
+        """Pose constant near face alone is NOT enough - needs phone object."""
         analyzer = WalkingPhoneAnalyzer(self.CONFIG)
         track = _make_walking_track(1, [50, 0, 150, 200])
         bbox = [50, 0, 150, 200]
 
-        # Hand always near nose
         kps = _make_keypoints({
             NOSE: (100, 30, 0.9),
             RIGHT_WRIST: (103, 33, 0.8),
@@ -62,8 +61,7 @@ class TestWalkingPhoneAnalyzer:
             events = analyzer.update(i, [track], [], pose_detections=[pose])
             all_events.extend(events)
 
-        assert len(all_events) == 1
-        assert all_events[0].violation_type == "walking_phone"
+        assert len(all_events) == 0  # Pose alone is not enough
 
     def test_oscillation_no_trigger(self):
         """Hand oscillating (smoking pattern) should NOT trigger phone."""
