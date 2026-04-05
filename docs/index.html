@@ -128,55 +128,48 @@
 
     <div id="demo-tabs" class="demo-tabs"></div>
 
-    <div class="demo-container">
-      <div id="video-area" class="video-container">
-        <video id="demo-video" class="demo-video" controls preload="metadata" style="display:none;"></video>
-        <div id="video-placeholder" class="video-placeholder">
-          <div>&#9654;</div>
-          <div>Loading...</div>
+    <div class="demo-layout">
+      <!-- Left: Video + Timeline -->
+      <div class="demo-left">
+        <div id="video-area" class="video-container">
+          <video id="demo-video" class="demo-video" controls preload="metadata" style="display:none;"></video>
+          <div id="video-placeholder" class="video-placeholder">
+            <div>&#9654;</div>
+            <div>Loading...</div>
+          </div>
+        </div>
+        <div class="timeline">
+          <div id="timeline-bar" class="timeline-bar"></div>
+          <div id="timeline-labels" class="timeline-labels">
+            <span>0:00</span><span>0:30</span>
+          </div>
+          <div class="timeline-legend">
+            <div class="legend-item"><span class="legend-dot walking_smoking"></span> Smoking</div>
+            <div class="legend-item"><span class="legend-dot walking_phone"></span> Phone</div>
+            <div class="legend-item"><span class="legend-dot signal_violation"></span> Red Light</div>
+          </div>
+        </div>
+        <div id="stats-summary" class="stats-summary">
+          <div class="stats-header">Statistics</div>
+          <div id="stats-body" class="stats-body"></div>
         </div>
       </div>
 
-      <!-- Timeline -->
-      <div class="timeline">
-        <div id="timeline-bar" class="timeline-bar"></div>
-        <div id="timeline-labels" class="timeline-labels">
-          <span>0:00</span><span>0:30</span>
+      <!-- Right: Event Log -->
+      <div class="demo-right">
+        <div class="event-log">
+          <div class="event-log-header">
+            <span>Detected Events</span>
+            <span id="event-count" class="event-count">0 events</span>
+          </div>
+          <div id="event-filters" class="event-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="walking_smoking">Smoking</button>
+            <button class="filter-btn" data-filter="walking_phone">Phone</button>
+            <button class="filter-btn" data-filter="signal_violation">Red Light</button>
+          </div>
+          <div id="event-list" class="event-list"></div>
         </div>
-        <div class="timeline-legend">
-          <div class="legend-item"><span class="legend-dot walking_smoking"></span> Walking Smoking</div>
-          <div class="legend-item"><span class="legend-dot walking_phone"></span> Walking Phone</div>
-          <div class="legend-item"><span class="legend-dot bicycle_phone"></span> Bicycle Phone</div>
-          <div class="legend-item"><span class="legend-dot bicycle_umbrella"></span> Bicycle Umbrella</div>
-          <div class="legend-item"><span class="legend-dot bicycle_wrong_way"></span> Wrong Way</div>
-          <div class="legend-item"><span class="legend-dot signal_violation"></span> Red Light</div>
-          <div class="legend-item"><span class="legend-dot sidewalk_riding"></span> Sidewalk</div>
-        </div>
-      </div>
-
-      <!-- Filter + Event Log -->
-      <div class="event-log">
-        <div class="event-log-header">
-          <span>Detected Events</span>
-          <span id="event-count" class="event-count">0 events</span>
-        </div>
-        <div id="event-filters" class="event-filters">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="walking_smoking">Walking Smoking</button>
-          <button class="filter-btn" data-filter="walking_phone">Walking Phone</button>
-          <button class="filter-btn" data-filter="bicycle_phone">Bicycle Phone</button>
-          <button class="filter-btn" data-filter="bicycle_umbrella">Bicycle Umbrella</button>
-          <button class="filter-btn" data-filter="bicycle_wrong_way">Wrong Way</button>
-          <button class="filter-btn" data-filter="signal_violation">Red Light</button>
-          <button class="filter-btn" data-filter="sidewalk_riding">Sidewalk</button>
-        </div>
-        <div id="event-list" class="event-list"></div>
-      </div>
-
-      <!-- Stats Summary -->
-      <div id="stats-summary" class="stats-summary">
-        <div class="stats-header">Statistics</div>
-        <div id="stats-body" class="stats-body"></div>
       </div>
     </div>
   </div>
