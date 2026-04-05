@@ -137,6 +137,18 @@ ruff check .
 python scripts/export_demo_assets.py
 ```
 
+## Accuracy notes
+
+Violation detection accuracy depends heavily on input quality:
+
+| Condition | Walking Smoking | Walking Phone | Signal Violation |
+|---|---|---|---|
+| 480p live camera (far) | Not reliable | Not reliable | Requires signal ROI |
+| 720p+ close angle | Cigarette model + pose | Phone object + pose | Auto or ROI |
+| 1080p+ close angle | High accuracy | High accuracy | High accuracy |
+
+All detection results are verified by local VLM (Gemma 4) to filter false positives.
+
 ## Roadmap
 
 - [x] Core pipeline (detection, tracking, behavior analysis)
