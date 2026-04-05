@@ -44,6 +44,30 @@
     }
   },
   {
+    "video_id": "bicycle_phone",
+    "video_file": "bicycle_phone_1.mp4",
+    "fps": 25.0,
+    "total_frames": 254,
+    "resolution": "1080x1920",
+    "events": [
+      {
+        "type": "bicycle_phone",
+        "track_id": 1,
+        "start_frame": 2,
+        "end_frame": 7,
+        "confidence": 0.78,
+        "start_time": 0.08,
+        "end_time": 0.28,
+        "snapshot": "assets/img/events/bicycle_phone_event_0.jpg",
+        "vlm_evaluation": {
+          "bicycle_phone": true,
+          "confidence": "high",
+          "description": "Person next to bicycle actively using mobile phone"
+        }
+      }
+    ]
+  },
+  {
     "video_id": "smoking_outdoor",
     "video_file": "mixkit_13736.mp4",
     "fps": 25.0,
