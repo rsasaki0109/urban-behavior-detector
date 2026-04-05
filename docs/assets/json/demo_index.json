@@ -38,5 +38,28 @@
       "lon": 141.3545,
       "name": "Sapporo, Minami-1-jo/Higashi-4-chome"
     }
+  },
+  {
+    "video_id": "smoking_street",
+    "fps": 25.0,
+    "total_frames": 565,
+    "resolution": "1280x720",
+    "events": [
+      {
+        "type": "walking_smoking",
+        "track_id": 1,
+        "start_frame": 0,
+        "end_frame": 2,
+        "confidence": 0.74,
+        "start_time": 0.0,
+        "end_time": 0.08,
+        "snapshot": "assets/img/events/smoking_street_event_0.jpg",
+        "vlm_evaluation": {
+          "smoking_detected": true,
+          "confidence": "high",
+          "description": "The person is visibly smoking a cigarette. A lit cigarette is held in his right hand, and plumes of smoke are clearly visible around his face."
+        }
+      }
+    ]
   }
 ]
