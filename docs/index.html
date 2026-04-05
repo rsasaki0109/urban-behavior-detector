@@ -39,10 +39,11 @@
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <h1>Detect <span>Urban Violations</span><br>from Video</h1>
+    <h1>Detect <span>Bicycle Violations</span><br>from Video</h1>
     <p class="hero-sub">
-      Walking smoking, bicycle infractions &mdash; detected from live camera feeds
-      using YOLO + rule-based behavior analysis. Open source.
+      2026年4月施行の自転車「青切符」対象違反をAIで自動検知。<br>
+      ながらスマホ・信号無視・傘差し運転・逆走・歩道走行 &mdash;
+      YOLO + pose estimation + VLM verification. Open source.
     </p>
     <div class="hero-actions">
       <a href="#demo" class="btn btn-primary">View Demo</a>
@@ -57,27 +58,44 @@
 <!-- Supported Violations -->
 <section id="violations">
   <div class="container">
-    <p class="section-label">Detection Targets</p>
-    <h2>Supported Violations</h2>
+    <p class="section-label">2026年4月施行 道路交通法改正対応</p>
+    <h2>青切符対象違反の検知</h2>
     <p class="section-desc">
-      Rule-based behavior analysis layered on top of object detection and tracking.
-      Each violation type is independently configurable.
+      自転車の交通反則通告制度（青切符）の対象となる113種類の違反のうち、
+      映像解析で検知可能な5種類をAIで自動検出。16歳以上が対象、反則金5,000〜12,000円。
     </p>
     <div class="card-grid">
-      <div class="card violation-smoking">
-        <div class="card-icon">&#128684;</div>
-        <h3>Walking Smoking</h3>
-        <p>Detects pedestrians smoking while walking by analyzing hand-to-mouth proximity, movement speed, and duration of the behavior pattern.</p>
-      </div>
       <div class="card violation-phone">
         <div class="card-icon">&#128241;</div>
-        <h3>Bicycle + Phone</h3>
-        <p>Identifies cyclists using a smartphone while riding by detecting phone proximity to the rider's face region.</p>
+        <h3>ながらスマホ</h3>
+        <p>自転車運転中のスマホ操作を検知。YOLO cell phone検出 + 人物-自転車ペアリング。反則金 12,000円。</p>
+      </div>
+      <div class="card violation-smoking">
+        <div class="card-icon">&#128679;</div>
+        <h3>信号無視</h3>
+        <p>赤信号での交差点通過を検知。信号ROI色判定 + crossing zone内の移動体検出。反則金 6,000円。</p>
       </div>
       <div class="card violation-umbrella">
         <div class="card-icon">&#9748;</div>
-        <h3>Bicycle + Umbrella</h3>
-        <p>Detects cyclists riding with an open umbrella by checking for umbrella overlap with the cyclist's bounding box.</p>
+        <h3>傘差し運転</h3>
+        <p>傘を差しながらの自転車運転を検知。umbrella検出 + cyclist bboxオーバーラップ判定。反則金 6,000円。</p>
+      </div>
+    </div>
+    <div class="card-grid" style="margin-top:16px;">
+      <div class="card violation-smoking">
+        <div class="card-icon">&#8592;</div>
+        <h3>逆走（右側通行）</h3>
+        <p>車道右側の逆走を検知。移動方向角度 vs 期待走行方向で判定。反則金 6,000円。</p>
+      </div>
+      <div class="card violation-phone">
+        <div class="card-icon">&#128694;</div>
+        <h3>歩道走行</h3>
+        <p>歩道上の自転車走行を検知。ROIポリゴンで歩道エリアを定義し位置判定。反則金 6,000円。</p>
+      </div>
+      <div class="card violation-umbrella">
+        <div class="card-icon">&#128684;</div>
+        <h3>歩きタバコ（付加機能）</h3>
+        <p>路上喫煙禁止区域での歩きタバコを検知。タバコ検出モデル + VLM検証。条例違反 過料2,000円。</p>
       </div>
     </div>
   </div>

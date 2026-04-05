@@ -1,6 +1,8 @@
 # urban-behavior-detector
 
-Detect urban violations from video using YOLO + rule-based behavior analysis + VLM verification.
+**2026年4月施行「自転車青切符」対応** — 自転車の交通違反をAIで自動検知するOSS。
+
+ながらスマホ(12,000円)・信号無視(6,000円)・傘差し運転(6,000円)・逆走(6,000円)・歩道走行(6,000円) を映像から検出。
 
 **[Demo Site](https://rsasaki0109.github.io/urban-behavior-detector/)** | **[GitHub](https://github.com/rsasaki0109/urban-behavior-detector)**
 
@@ -15,17 +17,22 @@ Processes video (live camera, RTSP stream, or file) through a multi-stage pipeli
 5. **VLM verification** - Local VLM (Gemma 4) filters false positives from snapshots
 6. **Output** - Structured JSON events + annotated video + event snapshots
 
-### Supported violations
+### 青切符対象違反の検知
 
-| Violation | Detection method | VLM verified |
+| 違反 | 反則金 | 検出方法 | VLM検証 |
+|---|---|---|---|
+| **ながらスマホ** | 12,000円 | YOLO cell phone + cyclist pairing | 1/1 confirmed |
+| **信号無視** | 6,000円 | Signal ROI HSV + crossing zone | implemented |
+| **傘差し運転** | 6,000円 | Umbrella overlap with cyclist | implemented |
+| **逆走** | 6,000円 | Direction angle vs expected | implemented |
+| **歩道走行** | 6,000円 | ROI polygon zone check | implemented |
+
+### 付加機能
+
+| 違反 | 検出方法 | VLM検証 |
 |---|---|---|
-| Walking smoking | Cigarette model + person tracking | 4/4 confirmed |
-| Walking phone | Cell phone object near face + walking | - |
-| Bicycle + phone | Phone near cyclist's face region | - |
-| Bicycle + umbrella | Umbrella overlap with cyclist bbox | - |
-| Wrong-way cycling | Direction angle vs expected lane direction | - |
-| Red light running | Signal ROI HSV color + crossing zone | - |
-| Sidewalk riding | ROI polygon zone + bicycle position | - |
+| 歩きタバコ | Cigarette model + pose | 4/4 confirmed |
+| 歩きスマホ | Phone object + pose | implemented |
 
 ## Quick start
 
