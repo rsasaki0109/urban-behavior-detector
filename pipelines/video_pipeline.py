@@ -17,7 +17,9 @@ from behaviors.walking_smoking import WalkingSmokingAnalyzer
 from behaviors.wrong_way import WrongWayAnalyzer
 from detectors.cigarette_detector import CigaretteDetector
 from detectors.pose_detector import PoseDetector
-from detectors.signal_detector import SignalDetection, classify_signal_color
+from detectors.signal_detector import (
+    SignalDetection, classify_signal_color, detect_signals_from_rois,
+)
 from detectors.yolo_detector import Detection, YOLODetector
 from trackers.sort_tracker import SORTTracker
 
@@ -83,8 +85,10 @@ class VideoPipeline:
             self.analyzers.append(BicycleViolationAnalyzer(phone_cfg, umbrella_cfg))
         if self.config.get("bicycle_wrong_way", {}).get("enabled", False):
             self.analyzers.append(WrongWayAnalyzer(self.config["bicycle_wrong_way"]))
-        if self.config.get("signal_violation", {}).get("enabled", False):
-            self.analyzers.append(SignalViolationAnalyzer(self.config["signal_violation"]))
+        sig_cfg = self.config.get("signal_violation", {})
+        if sig_cfg.get("enabled", False):
+            self.analyzers.append(SignalViolationAnalyzer(sig_cfg))
+        self.signal_rois = sig_cfg.get("signal_rois", [])
         if self.config.get("sidewalk_riding", {}).get("enabled", False):
             self.analyzers.append(SidewalkRidingAnalyzer(self.config["sidewalk_riding"]))
         if self.config.get("walking_phone", {}).get("enabled", False):
@@ -133,7 +137,7 @@ class VideoPipeline:
             if self.cigarette_detector:
                 cigarette_detections = self.cigarette_detector.detect(frame)
 
-            # Signal color classification
+            # Signal color classification (YOLO auto-detect or fixed ROI)
             signal_detections = None
             traffic_lights = [d for d in detections if d.class_name == "traffic light"]
             if traffic_lights:
@@ -145,6 +149,8 @@ class VideoPipeline:
                     )
                     for d in traffic_lights
                 ]
+            elif self.signal_rois:
+                signal_detections = detect_signals_from_rois(frame, self.signal_rois)
 
             # Track (only persons and bicycles)
             trackable = [d for d in detections if d.class_name in ("person", "bicycle", "car", "motorcycle", "bus", "truck")]
@@ -284,6 +290,8 @@ class VideoPipeline:
                         )
                         for d in traffic_lights
                     ]
+                elif self.signal_rois:
+                    signal_detections = detect_signals_from_rois(frame, self.signal_rois)
 
                 cigarette_detections = None
                 if self.cigarette_detector:
@@ -396,6 +404,17 @@ class VideoPipeline:
             label = f"{track.class_name} #{track.track_id}"
             cv2.putText(out, label, (x1, y1 - 8),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+        # Draw signal ROIs
+        if cigarette_detections is None and hasattr(self, 'signal_rois') and self.signal_rois:
+            for roi in self.signal_rois:
+                rx1, ry1, rx2, ry2 = [int(v) for v in roi]
+                color_state = classify_signal_color(out, np.array(roi, dtype=float))
+                roi_color = {"red": (0, 0, 255), "green": (0, 255, 0),
+                             "yellow": (0, 255, 255)}.get(color_state.value, (128, 128, 128))
+                cv2.rectangle(out, (rx1, ry1), (rx2, ry2), roi_color, 2)
+                cv2.putText(out, f"signal:{color_state.value}", (rx1, ry1 - 4),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.35, roi_color, 1)
 
         # Draw violation alerts
         for event in events:
