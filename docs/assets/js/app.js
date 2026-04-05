@@ -146,7 +146,7 @@
     count.textContent = events.length + ' events';
 
     if (events.length === 0) {
-      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No violations detected in this footage.<br>Detection &amp; tracking are active &mdash; see the annotated video above.</div>';
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">No violations detected in this footage (VLM-verified).<br>Person/vehicle detection &amp; tracking are active &mdash; see the annotated video above.<br><br><span style="font-size:0.7rem;">Note: 480p live camera resolution is insufficient for reliable cigarette/phone detection.<br>Higher resolution input (&ge;720p, closer camera angle) is recommended for violation detection.</span></div>';
       return;
     }
 
