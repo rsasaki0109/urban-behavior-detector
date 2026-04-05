@@ -4,58 +4,7 @@
   "fps": 30.0,
   "total_frames": 3600,
   "resolution": "854x480",
-  "events": [
-    {
-      "type": "signal_violation",
-      "track_id": 17,
-      "start_frame": 1020,
-      "end_frame": 1022,
-      "confidence": 0.69,
-      "start_time": 34.0,
-      "end_time": 34.07,
-      "snapshot": "assets/img/events/sapporo_intersection_event_0.jpg"
-    },
-    {
-      "type": "signal_violation",
-      "track_id": 41,
-      "start_frame": 2800,
-      "end_frame": 2803,
-      "confidence": 0.67,
-      "start_time": 93.33,
-      "end_time": 93.43,
-      "snapshot": "assets/img/events/sapporo_intersection_event_1.jpg"
-    },
-    {
-      "type": "signal_violation",
-      "track_id": 45,
-      "start_frame": 2838,
-      "end_frame": 2840,
-      "confidence": 0.69,
-      "start_time": 94.6,
-      "end_time": 94.67,
-      "snapshot": "assets/img/events/sapporo_intersection_event_2.jpg"
-    },
-    {
-      "type": "signal_violation",
-      "track_id": 44,
-      "start_frame": 2841,
-      "end_frame": 2844,
-      "confidence": 0.67,
-      "start_time": 94.7,
-      "end_time": 94.8,
-      "snapshot": "assets/img/events/sapporo_intersection_event_3.jpg"
-    },
-    {
-      "type": "signal_violation",
-      "track_id": 48,
-      "start_frame": 3048,
-      "end_frame": 3058,
-      "confidence": 0.62,
-      "start_time": 101.6,
-      "end_time": 101.93,
-      "snapshot": "assets/img/events/sapporo_intersection_event_4.jpg"
-    }
-  ],
+  "events": [],
   "location": {
     "lat": 43.0618,
     "lon": 141.3545,

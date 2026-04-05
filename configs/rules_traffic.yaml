@@ -22,6 +22,10 @@ signal_violation:
   # Fixed ROI for signal at Sapporo intersection (auto-detected at ~692,219)
   signal_rois:
     - [685, 210, 720, 240]
+  # Crossing zone: the crosswalk area where vehicles/pedestrians cross
+  # Only trigger violation when someone is IN this zone while signal is red
+  crossing_zones:
+    - [[350, 280], [550, 280], [550, 340], [350, 340]]
 
 sidewalk_riding:
   enabled: false

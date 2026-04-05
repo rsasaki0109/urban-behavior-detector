@@ -93,53 +93,46 @@ class TestSmokingOscillation:
         "min_oscillations": 2,
     }
 
-    def test_oscillation_pattern_triggers(self):
-        """Hand moving to mouth and back repeatedly = smoking."""
+    def test_oscillation_alone_not_enough(self):
+        """Oscillation without cigarette detection should NOT trigger."""
         analyzer = WalkingSmokingAnalyzer(self.CONFIG)
         track = _make_walking_track(1, [50, 0, 150, 200])
         bbox = [50, 0, 150, 200]
 
         all_events = []
         for i in range(40):
-            # Oscillate: even frames = near nose, odd frames = far
             if i % 4 < 2:
-                # Near nose
-                kps = _make_keypoints({
-                    NOSE: (100, 30, 0.9),
-                    RIGHT_WRIST: (103, 33, 0.8),
-                })
+                kps = _make_keypoints({NOSE: (100, 30, 0.9), RIGHT_WRIST: (103, 33, 0.8)})
             else:
-                # Far from nose
-                kps = _make_keypoints({
-                    NOSE: (100, 30, 0.9),
-                    RIGHT_WRIST: (100, 150, 0.8),
-                })
+                kps = _make_keypoints({NOSE: (100, 30, 0.9), RIGHT_WRIST: (100, 150, 0.8)})
             pose = _make_pose(bbox, kps)
             events = analyzer.update(i, [track], [], pose_detections=[pose])
             all_events.extend(events)
 
-        assert len(all_events) == 1
-        assert all_events[0].violation_type == "walking_smoking"
+        # Oscillation alone is not enough - requires cigarette detection
+        assert len(all_events) == 0
 
-    def test_constant_near_nose_no_trigger(self):
-        """Hand constantly near nose (phone usage) should NOT trigger."""
+    def test_cigarette_plus_oscillation_triggers(self):
+        """Cigarette + oscillation = high confidence detection."""
+        from detectors.cigarette_detector import CigaretteDetection
         analyzer = WalkingSmokingAnalyzer(self.CONFIG)
         track = _make_walking_track(1, [50, 0, 150, 200])
         bbox = [50, 0, 150, 200]
-
-        # Hand always near nose - no oscillation
-        kps = _make_keypoints({
-            NOSE: (100, 30, 0.9),
-            RIGHT_WRIST: (103, 33, 0.8),
-        })
-        pose = _make_pose(bbox, kps)
+        cig = CigaretteDetection(bbox=np.array([90, 25, 110, 40], dtype=float), confidence=0.4)
 
         all_events = []
         for i in range(40):
-            events = analyzer.update(i, [track], [], pose_detections=[pose])
+            if i % 4 < 2:
+                kps = _make_keypoints({NOSE: (100, 30, 0.9), RIGHT_WRIST: (103, 33, 0.8)})
+            else:
+                kps = _make_keypoints({NOSE: (100, 30, 0.9), RIGHT_WRIST: (100, 150, 0.8)})
+            pose = _make_pose(bbox, kps)
+            events = analyzer.update(i, [track], [], pose_detections=[pose],
+                                     cigarette_detections=[cig])
             all_events.extend(events)
 
-        assert len(all_events) == 0
+        assert len(all_events) == 1
+        assert all_events[0].confidence >= 0.8  # high conf from both signals
 
     def test_no_pose_no_crash(self):
         """Without pose data, no events and no crash."""

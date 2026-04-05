@@ -129,10 +129,15 @@ class TestSignalViolationAnalyzer:
         events = analyzer.update(0, [track], [], None)
         assert events == []
 
-    def test_pedestrian_red_light(self):
-        """Walking person crossing on red should trigger."""
-        config = {**self.CONFIG, "detect_pedestrians": True}
+    def test_pedestrian_red_light_with_crossing_zone(self):
+        """Person in crossing zone on red should trigger."""
+        config = {
+            **self.CONFIG,
+            "detect_pedestrians": True,
+            "crossing_zones": [[[50, 100], [250, 100], [250, 200], [50, 200]]],
+        }
         analyzer = SignalViolationAnalyzer(config)
+        # Person center at (150, 150) - inside the crossing zone
         center = np.array([150.0, 150.0])
         person = Track(
             track_id=1, class_name="person",
@@ -149,3 +154,28 @@ class TestSignalViolationAnalyzer:
 
         assert len(all_events) == 1
         assert all_events[0].violation_type == "signal_violation"
+
+    def test_person_outside_crossing_zone_no_trigger(self):
+        """Person outside crossing zone should NOT trigger even with red signal."""
+        config = {
+            **self.CONFIG,
+            "detect_pedestrians": True,
+            "crossing_zones": [[[50, 100], [250, 100], [250, 200], [50, 200]]],
+        }
+        analyzer = SignalViolationAnalyzer(config)
+        # Person center at (150, 350) - OUTSIDE the crossing zone
+        center = np.array([150.0, 350.0])
+        person = Track(
+            track_id=1, class_name="person",
+            bbox=np.array([100, 300, 200, 400], dtype=float),
+            center=center, hits=5,
+            history=[np.array([150.0 - 5 * (5 - i), 350.0]) for i in range(6)],
+        )
+        signal = _make_signal([130, 50, 170, 90], SignalColor.RED)
+
+        all_events = []
+        for i in range(10):
+            events = analyzer.update(i, [person], [], [signal])
+            all_events.extend(events)
+
+        assert len(all_events) == 0

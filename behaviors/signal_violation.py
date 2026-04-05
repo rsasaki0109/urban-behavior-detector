@@ -1,13 +1,15 @@
-"""Red light running detection for bicycles and pedestrians.
+"""Red light running detection for bicycles, pedestrians, and vehicles.
 
 Logic:
-- A traffic signal is detected as RED
-- A bicycle or pedestrian passes through the signal's proximity zone while red
-- The crossing behavior persists for min_duration_frames
+- A traffic signal is detected as RED (via YOLO or fixed ROI)
+- A target (bicycle/person/car) moves through a defined crossing zone while red
+- The crossing zone is a polygon defined in config (required for accurate detection)
+- Without a crossing zone, falls back to signal proximity check
 """
 
 from collections import defaultdict
 
+import cv2
 import numpy as np
 
 from behaviors.base import BehaviorAnalyzer, ViolationEvent, compute_confidence
@@ -16,11 +18,10 @@ from trackers.sort_tracker import Track
 
 
 class SignalViolationAnalyzer(BehaviorAnalyzer):
-    """Detect bicycles and pedestrians running red lights."""
+    """Detect red light violations using crossing zone + signal state."""
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.proximity_threshold = config.get("proximity_threshold", 200)
         self.min_duration = config.get("min_duration_frames", 5)
         self.confidence_threshold = config.get("confidence_threshold", 0.5)
         self.min_crossing_speed = config.get("min_crossing_speed", 2.0)
@@ -32,13 +33,29 @@ class SignalViolationAnalyzer(BehaviorAnalyzer):
         if self.detect_vehicles:
             self.target_classes.extend(["car", "motorcycle", "bus", "truck"])
 
-        # track_id -> list of frame indices where red-light crossing detected
+        # Crossing zone: polygon where people/vehicles cross
+        raw_zones = config.get("crossing_zones", [])
+        self.crossing_zones = [
+            np.array(zone, dtype=np.int32) for zone in raw_zones
+        ]
+
+        # Fallback: proximity to signal (less accurate)
+        self.proximity_threshold = config.get("proximity_threshold", 200)
+
         self._candidates: dict[int, list[int]] = defaultdict(list)
         self._reported: set[int] = set()
         self._events: list[ViolationEvent] = []
 
+    def _is_in_crossing_zone(self, track: Track) -> bool:
+        """Check if track center is inside any crossing zone polygon."""
+        pt = (int(track.center[0]), int(track.center[1]))
+        for zone in self.crossing_zones:
+            if cv2.pointPolygonTest(zone, pt, False) >= 0:
+                return True
+        return False
+
     def _is_near_signal(self, track: Track, signal: SignalDetection) -> bool:
-        """Check if a bicycle track is near a traffic signal."""
+        """Fallback: check proximity to signal."""
         dist = np.linalg.norm(track.center - signal.center)
         return dist < self.proximity_threshold
 
@@ -60,9 +77,15 @@ class SignalViolationAnalyzer(BehaviorAnalyzer):
             if track.speed < self.min_crossing_speed:
                 continue
 
-            near_red = any(self._is_near_signal(track, sig) for sig in red_signals)
+            # Use crossing zone if defined (accurate), else proximity (fallback)
+            if self.crossing_zones:
+                in_violation = self._is_in_crossing_zone(track)
+            else:
+                in_violation = any(
+                    self._is_near_signal(track, sig) for sig in red_signals
+                )
 
-            if near_red:
+            if in_violation:
                 self._candidates[track.track_id].append(frame_idx)
             else:
                 frames = self._candidates.get(track.track_id, [])
