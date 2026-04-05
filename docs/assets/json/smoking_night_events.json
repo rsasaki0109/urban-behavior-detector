@@ -1,0 +1,44 @@
+{
+  "video_id": "smoking_night",
+  "video_file": "mixkit_39476.mp4",
+  "fps": 25.0,
+  "total_frames": 361,
+  "resolution": "1280x720",
+  "events": [
+    {
+      "type": "walking_smoking",
+      "track_id": 1,
+      "start_frame": 7,
+      "end_frame": 61,
+      "confidence": 0.68,
+      "start_time": 0.28,
+      "end_time": 2.44,
+      "snapshot": "assets/img/events/smoking_night_event_0.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": true,
+        "confidence": "high",
+        "description": "A person in the image is holding a visible cigarette/smoking object near their mouth with their right hand, indicating the action of smoking while walking."
+      }
+    },
+    {
+      "type": "walking_smoking",
+      "track_id": 2,
+      "start_frame": 131,
+      "end_frame": 137,
+      "confidence": 0.73,
+      "start_time": 5.24,
+      "end_time": 5.48,
+      "snapshot": "assets/img/events/smoking_night_event_1.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": true,
+        "confidence": "high",
+        "description": "A person (person #1) is visible in the center-right, raising their hand to mouth level, which is consistent with smoking. The hand/mouth area is marked with a red bounding box."
+      }
+    }
+  ],
+  "location": {
+    "lat": 35.6938,
+    "lon": 139.7034,
+    "name": "Kabukicho, Shinjuku"
+  }
+}

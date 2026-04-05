@@ -1,0 +1,29 @@
+{
+  "video_id": "smoking_outdoor",
+  "video_file": "mixkit_13736.mp4",
+  "fps": 25.0,
+  "total_frames": 495,
+  "resolution": "1280x720",
+  "events": [
+    {
+      "type": "walking_smoking",
+      "track_id": 1,
+      "start_frame": 2,
+      "end_frame": 5,
+      "confidence": 0.77,
+      "start_time": 0.08,
+      "end_time": 0.2,
+      "snapshot": "assets/img/events/smoking_outdoor_event_0.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": true,
+        "confidence": "high",
+        "description": "A man in the right panel has his hand raised to his mouth, consistent with the action of smoking."
+      }
+    }
+  ],
+  "location": {
+    "lat": 35.6938,
+    "lon": 139.7034,
+    "name": "Kabukicho, Shinjuku"
+  }
+}
