@@ -35,6 +35,10 @@ class YOLODetector:
     COCO_NAMES = {
         0: "person",
         1: "bicycle",
+        2: "car",
+        3: "motorcycle",
+        5: "bus",
+        7: "truck",
         9: "traffic light",
         25: "umbrella",
         26: "handbag",

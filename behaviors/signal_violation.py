@@ -25,9 +25,12 @@ class SignalViolationAnalyzer(BehaviorAnalyzer):
         self.confidence_threshold = config.get("confidence_threshold", 0.5)
         self.min_crossing_speed = config.get("min_crossing_speed", 2.0)
         self.detect_pedestrians = config.get("detect_pedestrians", True)
+        self.detect_vehicles = config.get("detect_vehicles", True)
         self.target_classes = ["bicycle"]
         if self.detect_pedestrians:
             self.target_classes.append("person")
+        if self.detect_vehicles:
+            self.target_classes.extend(["car", "motorcycle", "bus", "truck"])
 
         # track_id -> list of frame indices where red-light crossing detected
         self._candidates: dict[int, list[int]] = defaultdict(list)
