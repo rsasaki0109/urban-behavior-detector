@@ -1,0 +1,64 @@
+{
+  "video_id": "signal",
+  "video_file": "sapporo_intersection.mp4",
+  "fps": 30.0,
+  "total_frames": 3600,
+  "resolution": "854x480",
+  "events": [
+    {
+      "type": "signal_violation",
+      "track_id": 9,
+      "start_frame": 448,
+      "end_frame": 451,
+      "confidence": 0.67,
+      "start_time": 14.93,
+      "end_time": 15.03,
+      "snapshot": "assets/img/events/signal_event_0.jpg"
+    },
+    {
+      "type": "signal_violation",
+      "track_id": 11,
+      "start_frame": 530,
+      "end_frame": 532,
+      "confidence": 0.69,
+      "start_time": 17.67,
+      "end_time": 17.73,
+      "snapshot": "assets/img/events/signal_event_0.jpg"
+    },
+    {
+      "type": "signal_violation",
+      "track_id": 30,
+      "start_frame": 2400,
+      "end_frame": 2404,
+      "confidence": 0.65,
+      "start_time": 80.0,
+      "end_time": 80.13,
+      "snapshot": "assets/img/events/signal_event_0.jpg"
+    },
+    {
+      "type": "signal_violation",
+      "track_id": 44,
+      "start_frame": 2796,
+      "end_frame": 2801,
+      "confidence": 0.64,
+      "start_time": 93.2,
+      "end_time": 93.37,
+      "snapshot": "assets/img/events/signal_event_0.jpg"
+    },
+    {
+      "type": "signal_violation",
+      "track_id": 46,
+      "start_frame": 2841,
+      "end_frame": 2843,
+      "confidence": 0.69,
+      "start_time": 94.7,
+      "end_time": 94.77,
+      "snapshot": "assets/img/events/signal_event_0.jpg"
+    }
+  ],
+  "location": {
+    "lat": 43.0618,
+    "lon": 141.3545,
+    "name": "Sapporo, Minami-1-jo/Higashi-4-chome"
+  }
+}

@@ -25,7 +25,7 @@ signal_violation:
   # Crossing zone: the crosswalk area where vehicles/pedestrians cross
   # Only trigger violation when someone is IN this zone while signal is red
   crossing_zones:
-    - [[350, 280], [550, 280], [550, 340], [350, 340]]
+    - [[300, 250], [600, 250], [600, 360], [300, 360]]
 
 sidewalk_riding:
   enabled: false
