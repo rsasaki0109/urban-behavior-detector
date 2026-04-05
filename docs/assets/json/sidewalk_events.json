@@ -1,0 +1,34 @@
+{
+  "video_id": "sidewalk",
+  "video_file": "bicycle_40867.mp4",
+  "fps": 23.976023976023978,
+  "total_frames": 245,
+  "resolution": "1280x720",
+  "events": [
+    {
+      "type": "sidewalk_riding",
+      "track_id": 1,
+      "start_frame": 1,
+      "end_frame": 3,
+      "confidence": 0.69,
+      "start_time": 0.04,
+      "end_time": 0.13,
+      "snapshot": "assets/img/events/sidewalk_event_0.jpg",
+      "vlm_evaluation": {
+        "sidewalk_riding": true,
+        "confidence": "high",
+        "description": "A bicycle is on a paved area that functions as a sidewalk/pedestrian path."
+      }
+    },
+    {
+      "type": "sidewalk_riding",
+      "track_id": 3,
+      "start_frame": 62,
+      "end_frame": 67,
+      "confidence": 0.64,
+      "start_time": 2.59,
+      "end_time": 2.79,
+      "snapshot": "assets/img/events/sidewalk_event_0.jpg"
+    }
+  ]
+}
