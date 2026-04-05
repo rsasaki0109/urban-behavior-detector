@@ -1,5 +1,19 @@
 [
   {
+    "video_id": "kabukicho_720p",
+    "video_file": "kabukicho_720p.mp4",
+    "fps": 30.0,
+    "total_frames": 9000,
+    "resolution": "1280x720",
+    "events": [],
+    "location": {
+      "lat": 35.6938,
+      "lon": 139.7034,
+      "name": "Kabukicho, Shinjuku (720p)"
+    },
+    "vlm_note": "All candidate detections evaluated by Gemma 4 VLM - 0 confirmed violations in 5min footage"
+  },
+  {
     "video_id": "kabukicho_5m_night",
     "video_file": "kabukicho_5m_night.mp4",
     "fps": 30.0,
