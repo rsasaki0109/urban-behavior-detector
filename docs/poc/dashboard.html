@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>違反検知ダッシュボード - PoC</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; }
+
+    .header { background: #1e293b; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+    .header h1 { font-size: 1.1rem; font-weight: 600; }
+    .header .status { display: flex; gap: 16px; font-size: 0.8rem; }
+    .header .status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .dot.green { background: #22c55e; }
+    .dot.yellow { background: #eab308; }
+
+    .layout { display: grid; grid-template-columns: 300px 1fr 350px; height: calc(100vh - 50px); }
+
+    /* Left: Camera list */
+    .sidebar { background: #1e293b; border-right: 1px solid #334155; overflow-y: auto; }
+    .sidebar h2 { padding: 16px; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+    .camera-item { padding: 12px 16px; border-bottom: 1px solid #334155; cursor: pointer; transition: background 0.15s; }
+    .camera-item:hover { background: #334155; }
+    .camera-item.active { background: #1d4ed8; }
+    .camera-name { font-weight: 600; font-size: 0.85rem; }
+    .camera-status { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+    .camera-alerts { font-size: 0.72rem; color: #f87171; margin-top: 2px; }
+
+    /* Center: Map + Stats */
+    .main { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px; text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: 700; }
+    .stat-label { font-size: 0.72rem; color: #94a3b8; margin-top: 4px; }
+    .stat-value.red { color: #ef4444; }
+    .stat-value.green { color: #22c55e; }
+    .stat-value.blue { color: #3b82f6; }
+    .stat-value.yellow { color: #eab308; }
+
+    #map { flex: 1; border-radius: 10px; min-height: 300px; }
+
+    /* Right: Alert feed */
+    .alerts { background: #1e293b; border-left: 1px solid #334155; overflow-y: auto; }
+    .alerts h2 { padding: 16px; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
+    .alerts h2 .count { background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; }
+
+    .alert-item { padding: 12px 16px; border-bottom: 1px solid #334155; }
+    .alert-item.new { border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.05); }
+    .alert-time { font-size: 0.7rem; color: #64748b; }
+    .alert-type { font-size: 0.8rem; font-weight: 600; margin-top: 2px; }
+    .alert-type.smoking { color: #ef4444; }
+    .alert-type.phone { color: #3b82f6; }
+    .alert-type.signal { color: #f59e0b; }
+    .alert-detail { font-size: 0.72rem; color: #94a3b8; margin-top: 4px; }
+    .alert-img { width: 100%; border-radius: 6px; margin-top: 8px; }
+    .alert-vlm { font-size: 0.68rem; color: #22c55e; margin-top: 4px; padding: 4px 8px; background: rgba(34,197,94,0.1); border-radius: 4px; }
+    .alert-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .alert-actions button { font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; border: 1px solid #475569; background: transparent; color: #e2e8f0; cursor: pointer; }
+    .alert-actions button.primary { background: #1d4ed8; border-color: #1d4ed8; }
+
+    @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } .sidebar, .alerts { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>違反検知ダッシュボード - 千代田区PoC</h1>
+  <div class="status">
+    <span><span class="dot green"></span>カメラ 5/5 稼働中</span>
+    <span><span class="dot yellow"></span>GPU使用率 62%</span>
+    <span>最終更新: <span id="time">--:--:--</span></span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Left: Camera list -->
+  <div class="sidebar">
+    <h2>カメラ一覧</h2>
+    <div class="camera-item active">
+      <div class="camera-name">CAM-01 秋葉原中央通り北</div>
+      <div class="camera-status">1080p 30fps | 稼働中</div>
+      <div class="camera-alerts">本日: 3件検知</div>
+    </div>
+    <div class="camera-item">
+      <div class="camera-name">CAM-02 秋葉原中央通り南</div>
+      <div class="camera-status">1080p 30fps | 稼働中</div>
+      <div class="camera-alerts">本日: 1件検知</div>
+    </div>
+    <div class="camera-item">
+      <div class="camera-name">CAM-03 神保町交差点</div>
+      <div class="camera-status">1080p 30fps | 稼働中</div>
+      <div class="camera-alerts">本日: 2件検知</div>
+    </div>
+    <div class="camera-item">
+      <div class="camera-name">CAM-04 御茶ノ水駅前</div>
+      <div class="camera-status">1080p 30fps | 稼働中</div>
+      <div class="camera-alerts">本日: 0件</div>
+    </div>
+    <div class="camera-item">
+      <div class="camera-name">CAM-05 九段下交差点</div>
+      <div class="camera-status">1080p 30fps | 稼働中</div>
+      <div class="camera-alerts">本日: 1件検知</div>
+    </div>
+  </div>
+
+  <!-- Center: Map + Stats -->
+  <div class="main">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value red">7</div>
+        <div class="stat-label">本日の検知数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value green">94%</div>
+        <div class="stat-label">VLM確認率</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value blue">29</div>
+        <div class="stat-label">処理FPS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value yellow">2:30</div>
+        <div class="stat-label">平均対応時間(分)</div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <!-- Right: Alert feed -->
+  <div class="alerts">
+    <h2>アラート <span class="count">7</span></h2>
+
+    <div class="alert-item new">
+      <div class="alert-time">11:42:15</div>
+      <div class="alert-type smoking">歩きタバコ</div>
+      <div class="alert-detail">CAM-01 | Track #142 | conf: 0.85</div>
+      <img class="alert-img" src="../assets/img/events/smoking_street_event_0.jpg" alt="">
+      <div class="alert-vlm">VLM: タバコを右手に持ち、煙が確認できる (confidence: high)</div>
+      <div class="alert-actions">
+        <button class="primary">巡回員に通知</button>
+        <button>詳細</button>
+        <button>誤検知報告</button>
+      </div>
+    </div>
+
+    <div class="alert-item new">
+      <div class="alert-time">11:38:02</div>
+      <div class="alert-type smoking">歩きタバコ</div>
+      <div class="alert-detail">CAM-03 | Track #89 | conf: 0.78</div>
+      <img class="alert-img" src="../assets/img/events/smoking_outdoor_event_0.jpg" alt="">
+      <div class="alert-vlm">VLM: 手を口元に持っていく喫煙動作を確認 (confidence: high)</div>
+      <div class="alert-actions">
+        <button class="primary">巡回員に通知</button>
+        <button>詳細</button>
+        <button>誤検知報告</button>
+      </div>
+    </div>
+
+    <div class="alert-item">
+      <div class="alert-time">11:25:44</div>
+      <div class="alert-type phone">自転車スマホ</div>
+      <div class="alert-detail">CAM-02 | Track #56 | conf: 0.73</div>
+      <img class="alert-img" src="../assets/img/events/bicycle_phone_event_0.jpg" alt="">
+      <div class="alert-vlm">VLM: 自転車横でスマホを操作中 (confidence: high)</div>
+      <div class="alert-actions">
+        <button>対応済み</button>
+        <button>詳細</button>
+      </div>
+    </div>
+
+    <div class="alert-item">
+      <div class="alert-time">11:12:30</div>
+      <div class="alert-type smoking">歩きタバコ</div>
+      <div class="alert-detail">CAM-01 | Track #34 | conf: 0.82</div>
+      <div class="alert-detail" style="margin-top:4px;">対応済み - 巡回員が指導完了</div>
+    </div>
+
+    <div class="alert-item">
+      <div class="alert-time">10:55:18</div>
+      <div class="alert-type smoking">歩きタバコ</div>
+      <div class="alert-detail">CAM-05 | Track #21 | conf: 0.76</div>
+      <div class="alert-detail" style="margin-top:4px;">対応済み</div>
+    </div>
+
+    <div class="alert-item">
+      <div class="alert-time">10:30:05</div>
+      <div class="alert-type smoking">歩きタバコ</div>
+      <div class="alert-detail">CAM-03 | Track #15 | conf: 0.81</div>
+      <div class="alert-detail" style="margin-top:4px;">対応済み</div>
+    </div>
+
+    <div class="alert-item">
+      <div class="alert-time">09:45:12</div>
+      <div class="alert-type smoking">歩きタバコ</div>
+      <div class="alert-detail">CAM-01 | Track #8 | conf: 0.79</div>
+      <div class="alert-detail" style="margin-top:4px;">対応済み</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Update time
+setInterval(() => {
+  document.getElementById('time').textContent = new Date().toLocaleTimeString('ja-JP');
+}, 1000);
+document.getElementById('time').textContent = new Date().toLocaleTimeString('ja-JP');
+
+// Map
+const map = L.map('map').setView([35.6995, 139.7710], 15);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OSM &copy; CARTO', maxZoom: 19,
+}).addTo(map);
+
+const cameras = [
+  { name: 'CAM-01 秋葉原中央通り北', lat: 35.7023, lon: 139.7715, alerts: 3 },
+  { name: 'CAM-02 秋葉原中央通り南', lat: 35.6985, lon: 139.7712, alerts: 1 },
+  { name: 'CAM-03 神保町交差点', lat: 35.6960, lon: 139.7575, alerts: 2 },
+  { name: 'CAM-04 御茶ノ水駅前', lat: 35.6998, lon: 139.7650, alerts: 0 },
+  { name: 'CAM-05 九段下交差点', lat: 35.6945, lon: 139.7510, alerts: 1 },
+];
+
+cameras.forEach(cam => {
+  const color = cam.alerts > 0 ? '#ef4444' : '#22c55e';
+  const radius = 8 + cam.alerts * 3;
+  L.circleMarker([cam.lat, cam.lon], {
+    radius, color, fillColor: color, fillOpacity: 0.4, weight: 2,
+  }).addTo(map).bindPopup(`<b>${cam.name}</b><br>本日: ${cam.alerts}件検知`);
+});
+</script>
+</body>
+</html>
