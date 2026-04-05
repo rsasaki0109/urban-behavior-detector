@@ -1,28 +1,31 @@
 # urban-behavior-detector
 
-Detect urban violations from video: walking smoking, bicycle phone usage, umbrella cycling, wrong-way cycling, and more.
+Detect urban violations from video using YOLO + rule-based behavior analysis + VLM verification.
 
-**[Demo Site](https://rsasaki0109.github.io/urban-behavior-detector/)**
+**[Demo Site](https://rsasaki0109.github.io/urban-behavior-detector/)** | **[GitHub](https://github.com/rsasaki0109/urban-behavior-detector)**
 
 ## What it does
 
-Processes video (live camera, RTSP stream, or file) through a pipeline:
+Processes video (live camera, RTSP stream, or file) through a multi-stage pipeline:
 
-1. **Detection** - YOLOv8 detects persons, bicycles, phones, umbrellas
+1. **Detection** - YOLOv8 detects persons, bicycles, vehicles, phones, umbrellas, traffic lights
 2. **Tracking** - IoU-based SORT assigns persistent IDs across frames
-3. **Behavior analysis** - Rule-based analyzers check spatial/temporal patterns
-4. **Output** - Structured JSON events + annotated video
+3. **Specialized models** - YOLOv8-pose (keypoints), cigarette detector (fine-tuned YOLOv11m)
+4. **Behavior analysis** - Rule-based analyzers check spatial/temporal patterns
+5. **VLM verification** - Local VLM (Gemma 4) filters false positives from snapshots
+6. **Output** - Structured JSON events + annotated video + event snapshots
 
 ### Supported violations
 
-| Violation | Method |
-|---|---|
-| Walking smoking | Hand-mouth proximity + movement speed + duration (or pose keypoints) |
-| Bicycle + phone | Phone near cyclist's face region |
-| Bicycle + umbrella | Umbrella overlap with cyclist bbox |
-| Wrong-way cycling | Direction angle vs expected lane direction |
-| Red light running | Traffic signal HSV color analysis + bicycle proximity |
-| Sidewalk riding | ROI polygon zone check + bicycle position |
+| Violation | Detection method | VLM verified |
+|---|---|---|
+| Walking smoking | Cigarette model + person tracking | 4/4 confirmed |
+| Walking phone | Cell phone object near face + walking | - |
+| Bicycle + phone | Phone near cyclist's face region | - |
+| Bicycle + umbrella | Umbrella overlap with cyclist bbox | - |
+| Wrong-way cycling | Direction angle vs expected lane direction | - |
+| Red light running | Signal ROI HSV color + crossing zone | - |
+| Sidewalk riding | ROI polygon zone + bicycle position | - |
 
 ## Quick start
 
@@ -32,11 +35,14 @@ pip install -r requirements.txt
 # Run on a video file
 python scripts/run_demo.py path/to/video.mp4
 
-# With custom output paths
-python scripts/run_demo.py video.mp4 -ov output.mp4 -oj events.json
+# With cigarette detection model
+python scripts/run_demo.py video.mp4 --config configs/rules_cigarette.yaml
 
 # JSON only (skip video generation)
 python scripts/run_demo.py video.mp4 --no-video
+
+# VLM verification of results
+python scripts/vlm_evaluate.py outputs/demo_events/result.json
 ```
 
 ### Streaming (RTSP / Webcam)
@@ -48,8 +54,9 @@ python scripts/run_stream.py 0 --display
 # RTSP stream
 python scripts/run_stream.py rtsp://192.168.1.100:554/stream
 
-# With frame limit
-python scripts/run_stream.py 0 --max-frames 1000 -oj results.json
+# YouTube live camera (resolve URL first)
+STREAM=$(yt-dlp --format 95 --get-url 'https://youtube.com/watch?v=VIDEO_ID')
+python scripts/run_stream.py "$STREAM" --max-frames 1800
 ```
 
 ### Docker
@@ -67,42 +74,41 @@ All thresholds and toggles are in `configs/rules.yaml`:
 ```yaml
 walking_smoking:
   enabled: true
-  hand_mouth_distance: 0.12
-  speed_threshold: 1.5
-  min_duration_frames: 8
-  pose_wrist_nose_ratio: 0.15  # for pose-based detection
+  speed_threshold: 0.8
+  min_duration_frames: 5
+  pose_wrist_nose_ratio: 0.15
+  min_oscillations: 2
 
-bicycle_phone:
+signal_violation:
   enabled: true
-  phone_near_face_threshold: 0.15
-  min_duration_frames: 6
-
-bicycle_wrong_way:
-  enabled: false  # requires per-scene direction config
-  expected_direction: "right"
-  angle_tolerance: 45
+  signal_rois: [[685, 210, 720, 240]]     # fixed signal position
+  crossing_zones: [[[350,280],[550,280],[550,340],[350,340]]]
 
 detection:
   model: "yolov8n.pt"
-  use_pose: false        # enable for pose-based smoking detection
+  use_pose: true
   pose_model: "yolov8n-pose.pt"
+  cigarette_model: "models/cigarette_yolov11m.pt"
 ```
 
 ## Output format
 
 ```json
 {
-  "video_id": "sample_01",
-  "fps": 30.0,
+  "video_id": "smoking_street",
   "events": [
     {
       "type": "walking_smoking",
-      "track_id": 3,
-      "start_frame": 120,
-      "end_frame": 165,
-      "confidence": 0.71,
-      "start_time": 4.0,
-      "end_time": 5.5
+      "track_id": 1,
+      "start_frame": 0,
+      "end_frame": 2,
+      "confidence": 0.77,
+      "snapshot": "snapshots/smoking_street_event_0.jpg",
+      "vlm_evaluation": {
+        "smoking_detected": true,
+        "confidence": "high",
+        "description": "A lit cigarette is held in his right hand..."
+      }
     }
   ]
 }
@@ -112,17 +118,39 @@ detection:
 
 ```
 urban-behavior-detector/
-├── detectors/          # YOLO object detection + pose estimation
-├── trackers/           # Object tracking (SORT)
-├── behaviors/          # Violation analysis logic
-├── pipelines/          # End-to-end video pipeline
-├── configs/            # YAML rule configurations
-├── scripts/            # CLI entry points (run_demo, run_stream, export)
-├── tests/              # Unit tests (pytest)
-├── docs/               # GitHub Pages demo site
-├── Dockerfile          # Container support
-└── outputs/            # Generated results
+├── detectors/          # YOLO detection + pose + cigarette + signal
+├── trackers/           # SORT tracking
+├── behaviors/          # 7 violation analyzers
+├── pipelines/          # Video + stream pipeline
+├── configs/            # YAML configs (default, cigarette, traffic, etc.)
+├── scripts/            # CLI: run_demo, run_stream, vlm_evaluate, etc.
+├── tests/              # 67 unit tests (pytest)
+├── models/             # Fine-tuned models (cigarette detector)
+├── docs/               # GitHub Pages demo site + heatmap
+├── Dockerfile
+└── outputs/            # Detection results + snapshots
 ```
+
+## Accuracy
+
+### Dog fooding results (RTX 4070, 720p)
+
+| Input | Detection | VLM verified | Speed |
+|---|---|---|---|
+| Stock footage (720p close-up) | Cigarette model detects smoking | **4/4 confirmed** | 22-29 fps |
+| Live camera (720p Kabukicho) | Cigarette model false positives | **0/2 confirmed** | 29 fps |
+| Live camera (480p Sapporo) | Signal ROI + crossing zone | 0 violations (compliant) | 29 fps |
+
+### Key findings
+
+- **720p close-up footage**: Cigarette detection works reliably, VLM confirms
+- **Live camera (720p far angle)**: Cigarette too small (~5px), false positives from bags/masks
+- **Signal violation**: Crossing zone concept eliminates false positives from nearby pedestrians
+- **GPU (RTX 4070)**: Real-time processing at 29 fps
+
+### Recommendation
+
+For production use, install dedicated cameras (1080p, close angle, 3-5m height) near target areas. Public live cameras are too far for reliable small-object detection.
 
 ## Development
 
@@ -133,32 +161,12 @@ pytest tests/ -v
 # Lint
 ruff check .
 
-# Export demo assets to GitHub Pages
+# Export demo assets
 python scripts/export_demo_assets.py
+
+# Generate heatmap data
+python scripts/generate_heatmap.py
 ```
-
-## Accuracy notes
-
-Violation detection accuracy depends heavily on input quality:
-
-| Condition | Walking Smoking | Walking Phone | Signal Violation |
-|---|---|---|---|
-| 480p live camera (far) | Not reliable | Not reliable | Requires signal ROI |
-| 720p+ close angle | Cigarette model + pose | Phone object + pose | Auto or ROI |
-| 1080p+ close angle | High accuracy | High accuracy | High accuracy |
-
-All detection results are verified by local VLM (Gemma 4) to filter false positives.
-
-## Roadmap
-
-- [x] Core pipeline (detection, tracking, behavior analysis)
-- [x] Wrong-way cycling detection
-- [x] Pose-based smoking detection (keypoints)
-- [x] Streaming input (RTSP, webcam)
-- [x] Docker support
-- [x] Traffic signal violation detection (HSV color analysis)
-- [x] Sidewalk cycling detection (ROI polygon zones)
-- [x] Geo-referenced violation heatmaps (Leaflet.js)
 
 ## License
 
