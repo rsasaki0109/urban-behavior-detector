@@ -8,23 +8,17 @@
     "events": [
       {
         "type": "signal_violation",
-        "track_id": 9,
-        "start_frame": 448,
-        "end_frame": 451,
-        "confidence": 0.67,
-        "start_time": 14.93,
-        "end_time": 15.03,
-        "snapshot": "assets/img/events/signal_event_0.jpg"
-      },
-      {
-        "type": "signal_violation",
         "track_id": 11,
         "start_frame": 530,
         "end_frame": 532,
         "confidence": 0.69,
         "start_time": 17.67,
         "end_time": 17.73,
-        "snapshot": "assets/img/events/signal_event_0.jpg"
+        "snapshot": "assets/img/events/signal_event_0.jpg",
+        "vlm_evaluation": {
+          "signal_violation": true,
+          "confidence": "high"
+        }
       },
       {
         "type": "signal_violation",
@@ -34,7 +28,11 @@
         "confidence": 0.65,
         "start_time": 80.0,
         "end_time": 80.13,
-        "snapshot": "assets/img/events/signal_event_0.jpg"
+        "snapshot": "assets/img/events/signal_event_0.jpg",
+        "vlm_evaluation": {
+          "signal_violation": true,
+          "confidence": "high"
+        }
       },
       {
         "type": "signal_violation",
@@ -44,7 +42,11 @@
         "confidence": 0.64,
         "start_time": 93.2,
         "end_time": 93.37,
-        "snapshot": "assets/img/events/signal_event_0.jpg"
+        "snapshot": "assets/img/events/signal_event_0.jpg",
+        "vlm_evaluation": {
+          "signal_violation": true,
+          "confidence": "high"
+        }
       },
       {
         "type": "signal_violation",
@@ -54,7 +56,11 @@
         "confidence": 0.69,
         "start_time": 94.7,
         "end_time": 94.77,
-        "snapshot": "assets/img/events/signal_event_0.jpg"
+        "snapshot": "assets/img/events/signal_event_0.jpg",
+        "vlm_evaluation": {
+          "signal_violation": true,
+          "confidence": "high"
+        }
       }
     ],
     "location": {
