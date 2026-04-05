@@ -355,6 +355,24 @@ nav .container {
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.03), rgba(129, 140, 248, 0.03));
 }
 
+.demo-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .demo-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.demo-right .event-log {
+  position: sticky;
+  top: 80px;
+}
+
 .video-container {
   position: relative;
   border-radius: 12px;
