@@ -13,12 +13,15 @@ bicycle_wrong_way:
 
 signal_violation:
   enabled: true
-  proximity_threshold: 250
+  proximity_threshold: 200
   min_duration_frames: 3
   confidence_threshold: 0.4
   min_crossing_speed: 1.5
   detect_pedestrians: true
   detect_vehicles: true
+  # Fixed ROI for signal at Sapporo intersection (auto-detected at ~692,219)
+  signal_rois:
+    - [685, 210, 720, 240]
 
 sidewalk_riding:
   enabled: false

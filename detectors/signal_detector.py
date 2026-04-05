@@ -1,7 +1,10 @@
 """Traffic signal color detection using HSV analysis.
 
-Uses YOLO to detect traffic lights (COCO class 9), then analyzes the
-cropped region with HSV color thresholds to determine the signal state.
+Two modes:
+1. Auto: Uses YOLO to detect traffic lights (COCO class 9)
+2. ROI: User specifies fixed signal regions in config (for fixed cameras)
+
+Both modes use HSV color thresholds to determine signal state (red/yellow/green).
 """
 
 from dataclasses import dataclass
@@ -87,3 +90,27 @@ def classify_signal_color(frame: np.ndarray, bbox: np.ndarray,
             best_color = color
 
     return best_color
+
+
+def detect_signals_from_rois(frame: np.ndarray,
+                             rois: list[list[int]]) -> list[SignalDetection]:
+    """Detect signal colors from fixed ROI regions.
+
+    Args:
+        frame: Full frame (BGR).
+        rois: List of [x1, y1, x2, y2] regions where traffic signals are located.
+
+    Returns:
+        List of SignalDetection with color classified by HSV.
+    """
+    detections = []
+    for roi in rois:
+        bbox = np.array(roi, dtype=float)
+        color = classify_signal_color(frame, bbox)
+        if color != SignalColor.UNKNOWN:
+            detections.append(SignalDetection(
+                bbox=bbox,
+                color=color,
+                confidence=0.8,
+            ))
+    return detections
