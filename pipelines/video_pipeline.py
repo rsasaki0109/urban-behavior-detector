@@ -147,7 +147,7 @@ class VideoPipeline:
                 ]
 
             # Track (only persons and bicycles)
-            trackable = [d for d in detections if d.class_name in ("person", "bicycle")]
+            trackable = [d for d in detections if d.class_name in ("person", "bicycle", "car", "motorcycle", "bus", "truck")]
             tracks = self.tracker.update(trackable)
 
             # Analyze behaviors
@@ -289,7 +289,7 @@ class VideoPipeline:
                 if self.cigarette_detector:
                     cigarette_detections = self.cigarette_detector.detect(frame)
 
-                trackable = [d for d in detections if d.class_name in ("person", "bicycle")]
+                trackable = [d for d in detections if d.class_name in ("person", "bicycle", "car", "motorcycle", "bus", "truck")]
                 tracks = self.tracker.update(trackable)
 
                 frame_events = []
@@ -370,7 +370,7 @@ class VideoPipeline:
 
         # Draw detections (thin boxes)
         for det in detections:
-            if det.class_name not in ("person", "bicycle"):
+            if det.class_name not in ("person", "bicycle", "car", "motorcycle", "bus", "truck"):
                 x1, y1, x2, y2 = det.bbox.astype(int)
                 cv2.rectangle(out, (x1, y1), (x2, y2), (128, 128, 128), 1)
                 cv2.putText(out, det.class_name, (x1, y1 - 4),
@@ -388,7 +388,10 @@ class VideoPipeline:
         # Draw tracked objects
         for track in tracks:
             x1, y1, x2, y2 = track.bbox.astype(int)
-            color = (0, 255, 0) if track.class_name == "person" else (255, 200, 0)
+            _track_colors = {"person": (0, 255, 0), "bicycle": (255, 200, 0),
+                            "car": (255, 150, 50), "motorcycle": (200, 100, 255),
+                            "bus": (100, 200, 255), "truck": (100, 200, 255)}
+            color = _track_colors.get(track.class_name, (200, 200, 200))
             cv2.rectangle(out, (x1, y1), (x2, y2), color, 2)
             label = f"{track.class_name} #{track.track_id}"
             cv2.putText(out, label, (x1, y1 - 8),

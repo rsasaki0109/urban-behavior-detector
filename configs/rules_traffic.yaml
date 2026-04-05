@@ -1,0 +1,41 @@
+# Traffic/intersection config
+
+walking_smoking:
+  enabled: false
+walking_phone:
+  enabled: false
+bicycle_phone:
+  enabled: false
+bicycle_umbrella:
+  enabled: false
+bicycle_wrong_way:
+  enabled: false
+
+signal_violation:
+  enabled: true
+  proximity_threshold: 250
+  min_duration_frames: 3
+  confidence_threshold: 0.4
+  min_crossing_speed: 1.5
+  detect_pedestrians: true
+  detect_vehicles: true
+
+sidewalk_riding:
+  enabled: false
+
+detection:
+  model: "yolov8n.pt"
+  confidence: 0.30
+  iou_threshold: 0.5
+  classes: [0, 1, 2, 3, 5, 7, 9]
+  use_pose: false
+
+tracking:
+  max_age: 30
+  min_hits: 2
+  iou_threshold: 0.3
+
+location:
+  lat: 43.0618
+  lon: 141.3545
+  name: "Sapporo, Minami-1-jo/Higashi-4-chome"

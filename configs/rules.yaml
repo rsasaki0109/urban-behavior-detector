@@ -44,6 +44,7 @@ signal_violation:
   confidence_threshold: 0.5
   min_crossing_speed: 2.0
   detect_pedestrians: true
+  detect_vehicles: true
 
 walking_phone:
   enabled: false
@@ -65,8 +66,8 @@ detection:
   model: "yolov8n.pt"
   confidence: 0.4
   iou_threshold: 0.5
-  classes: [0, 1, 9, 25, 26, 27, 39, 67]
-  # COCO classes: 0=person, 1=bicycle, 9=traffic light, 25=umbrella, 26=handbag, 27=tie, 39=bottle, 67=cell phone
+  classes: [0, 1, 2, 3, 5, 7, 9, 25, 26, 27, 39, 67]
+  # COCO classes: 0=person, 1=bicycle, 2=car, 3=motorcycle, 5=bus, 7=truck, 9=traffic light, 25=umbrella, 26=handbag, 27=tie, 39=bottle, 67=cell phone
   # Pose estimation (optional, improves walking smoking detection)
   use_pose: false
   pose_model: "yolov8n-pose.pt"
