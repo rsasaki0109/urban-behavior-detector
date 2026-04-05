@@ -64,40 +64,6 @@
     }
   },
   {
-    "video_id": "sidewalk",
-    "video_file": "bicycle_40867.mp4",
-    "fps": 23.976023976023978,
-    "total_frames": 245,
-    "resolution": "1280x720",
-    "events": [
-      {
-        "type": "sidewalk_riding",
-        "track_id": 1,
-        "start_frame": 1,
-        "end_frame": 3,
-        "confidence": 0.69,
-        "start_time": 0.04,
-        "end_time": 0.13,
-        "snapshot": "assets/img/events/sidewalk_event_0.jpg",
-        "vlm_evaluation": {
-          "sidewalk_riding": true,
-          "confidence": "high",
-          "description": "A bicycle is on a paved area that functions as a sidewalk/pedestrian path."
-        }
-      },
-      {
-        "type": "sidewalk_riding",
-        "track_id": 3,
-        "start_frame": 62,
-        "end_frame": 67,
-        "confidence": 0.64,
-        "start_time": 2.59,
-        "end_time": 2.79,
-        "snapshot": "assets/img/events/sidewalk_event_0.jpg"
-      }
-    ]
-  },
-  {
     "video_id": "smoking_night",
     "video_file": "mixkit_39476.mp4",
     "fps": 25.0,
@@ -214,25 +180,6 @@
           "confidence": "high",
           "description": "The person is visibly smoking a cigarette. A lit cigarette is held in his right hand, and plumes of smoke are clearly visible around his face."
         }
-      }
-    ]
-  },
-  {
-    "video_id": "wrongway",
-    "video_file": "bicycle_41878.mp4",
-    "fps": 23.976023976023978,
-    "total_frames": 284,
-    "resolution": "1280x720",
-    "events": [
-      {
-        "type": "bicycle_wrong_way",
-        "track_id": 2,
-        "start_frame": 2,
-        "end_frame": 5,
-        "confidence": 0.67,
-        "start_time": 0.08,
-        "end_time": 0.21,
-        "snapshot": "assets/img/events/wrongway_event_0.jpg"
       }
     ]
   },
