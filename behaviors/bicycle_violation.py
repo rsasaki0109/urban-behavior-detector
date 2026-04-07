@@ -174,5 +174,18 @@ class BicycleViolationAnalyzer(BehaviorAnalyzer):
 
         return new_events
 
+    def prune_stale_tracks(self, active_track_ids: set[int]) -> None:
+        """Remove state for tracks no longer active in the tracker."""
+        for tid in list(self._phone_candidates):
+            if tid not in active_track_ids:
+                del self._phone_candidates[tid]
+        for tid in list(self._umbrella_candidates):
+            if tid not in active_track_ids:
+                del self._umbrella_candidates[tid]
+        # Cap _reported to prevent unbounded growth
+        _MAX_REPORTED = 10000
+        if len(self._reported) > _MAX_REPORTED:
+            self._reported = set(sorted(self._reported)[-_MAX_REPORTED:])
+
     def finalize(self) -> list[ViolationEvent]:
         return self._events

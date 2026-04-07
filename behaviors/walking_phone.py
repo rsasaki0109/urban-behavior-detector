@@ -189,5 +189,17 @@ class WalkingPhoneAnalyzer(BehaviorAnalyzer):
 
         return new_events
 
+    def prune_stale_tracks(self, active_track_ids: set[int]) -> None:
+        """Remove state for tracks no longer active in the tracker."""
+        for tid in list(self._distance_history):
+            if tid not in active_track_ids:
+                del self._distance_history[tid]
+        for tid in list(self._candidates):
+            if tid not in active_track_ids:
+                del self._candidates[tid]
+        _MAX_REPORTED = 10000
+        if len(self._reported) > _MAX_REPORTED:
+            self._reported = set(sorted(self._reported)[-_MAX_REPORTED:])
+
     def finalize(self) -> list[ViolationEvent]:
         return self._events

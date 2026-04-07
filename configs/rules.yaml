@@ -71,6 +71,11 @@ detection:
   # Pose estimation (optional, improves walking smoking detection)
   use_pose: false
   pose_model: "yolov8n-pose.pt"
+  # ROI crop mode: crop each person bbox and run secondary detectors on the crop
+  # Improves accuracy for far-view / low-resolution scenarios
+  roi_crop: false
+  roi_crop_padding: 0.2       # Padding ratio around person bbox (20%)
+  roi_crop_min_size: 128      # Minimum crop size in pixels (upscale if smaller)
 
 # Tracker settings
 tracking:

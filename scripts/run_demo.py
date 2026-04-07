@@ -22,6 +22,8 @@ def main():
                         help="Output events JSON path")
     parser.add_argument("--no-video", action="store_true",
                         help="Skip video output")
+    parser.add_argument("--log-jsonl", default=None,
+                        help="Path for structured JSONL event log")
     args = parser.parse_args()
 
     video_path = Path(args.video)
@@ -41,6 +43,7 @@ def main():
         str(video_path),
         output_video=args.output_video if not args.no_video else None,
         output_json=args.output_json,
+        log_jsonl=args.log_jsonl,
     )
 
     print(f"\nDetected {len(events)} violation events:")
