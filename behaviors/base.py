@@ -67,3 +67,9 @@ class BehaviorAnalyzer(ABC):
     def finalize(self) -> list[ViolationEvent]:
         """Finalize and return any pending violation events."""
         ...
+
+    def prune_stale_tracks(self, active_track_ids: set[int]) -> None:
+        """Remove state for tracks no longer active in the tracker.
+
+        Override in subclasses that maintain per-track dicts.
+        """

@@ -34,6 +34,8 @@ def main():
                         help="Show live display window")
     parser.add_argument("--max-frames", type=int, default=0,
                         help="Stop after N frames (0 = unlimited)")
+    parser.add_argument("--log-jsonl", default=None,
+                        help="Path for structured JSONL event log")
     args = parser.parse_args()
 
     # Convert numeric source to int (webcam device)
@@ -52,6 +54,7 @@ def main():
         output_json=args.output_json,
         display=args.display,
         max_frames=args.max_frames,
+        log_jsonl=args.log_jsonl,
     )
 
     print(f"\nDetected {len(events)} violation events:")

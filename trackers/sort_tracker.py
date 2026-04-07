@@ -20,6 +20,9 @@ class Track:
     time_since_update: int = 0
     history: list[np.ndarray] = field(default_factory=list)
 
+    # Max history length to prevent unbounded growth in long streams
+    MAX_HISTORY = 30
+
     @property
     def speed(self) -> float:
         """Compute speed in pixels/frame from recent history."""
@@ -86,6 +89,8 @@ class SORTTracker:
                         self.tracks[i].bbox = detections[j].bbox
                         self.tracks[i].center = detections[j].center
                         self.tracks[i].history.append(detections[j].center.copy())
+                        if len(self.tracks[i].history) > Track.MAX_HISTORY:
+                            self.tracks[i].history = self.tracks[i].history[-Track.MAX_HISTORY:]
                         self.tracks[i].hits += 1
                         self.tracks[i].time_since_update = 0
                         matched_trk.add(i)
